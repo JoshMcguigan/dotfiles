@@ -1,0 +1,5 @@
+[user]
+	name = Josh Mcguigan
+	email = joshmcg88@gmail.com
+[core]
+	excludesfile = ~/.config/git/gitignore_global

@@ -1,0 +1,29 @@
+[theme]
+name = "bad-wolf"
+[theme.overrides]
+separator = ""
+
+[[block]]
+block = "memory"
+display_type = "memory"
+format_mem = "{Mupi}%"
+
+[[block]]
+block = "cpu"
+interval = 1
+
+[[block]]
+block = "sound"
+
+[[block]]
+block = "battery"
+interval = 10
+format = "{percentage}%"
+# The bar goes green when the battery above the `good` value. I set
+# this value to 101 to disable this behavior.
+good = 101
+
+[[block]]
+block = "time"
+interval = 60
+format = "%a %d/%m %R"

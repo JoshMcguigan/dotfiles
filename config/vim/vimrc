@@ -1,0 +1,202 @@
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+
+Plug 'airblade/vim-gitgutter'
+
+" Map <c-arrow> to resize splits
+Plug 'breuckelen/vim-resize'
+
+" Install fzf cli tool and vim plugin
+Plug 'junegunn/fzf.vim'
+
+Plug 'FooSoft/vim-argwrap'
+
+call plug#end()
+
+" manage coc plugins
+let g:coc_global_extensions = [
+	\ 'coc-highlight',
+	\ 'coc-rust-analyzer',
+	\ 'coc-json',
+	\ 'coc-python',
+\]
+
+" colors
+highlight Pmenu ctermbg=white
+highlight CocHighlightText ctermfg=darkyellow
+highlight CocHoverRange ctermfg=none ctermbg=none
+
+" enable comments in json files for jsonc support
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
+" configure yaml
+autocmd BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab indentkeys-=0# indentkeys-=<:>
+
+nnoremap <leader>v :source $MYVIMRC<CR>
+
+" For vim-resize plugin
+let g:resize_count = 1
+tnoremap <silent> <c-left> <C-\><C-N>:CmdResizeLeft<CR>i
+tnoremap <silent> <c-down> <C-\><C-N>:CmdResizeDown<CR>i
+tnoremap <silent> <c-up> <C-\><C-N>:CmdResizeUp<CR>i
+tnoremap <silent> <c-right> <C-\><C-N>:CmdResizeRight<CR>i
+
+" Put gitgutter preview into floating window
+let g:gitgutter_preview_win_floating = 1
+" Put gitgutter signs under language server signs
+let g:gitgutter_sign_priority=0
+" don't use default mappings for gitgutter
+let g:gitgutter_map_keys = 0
+
+nmap ]h <Plug>(GitGutterNextHunk)
+nmap [h <Plug>(GitGutterPrevHunk)
+nmap <leader>h <Plug>(GitGutterPreviewHunk)
+nmap <leader>u <Plug>(GitGutterUndoHunk)
+
+" Allow cursor to move to top and bottom of file
+" And ensure z-t moves line all the way to top of file
+set scrolloff=0
+
+" Smaller updatetime for CursorHold & CursorHoldI, and git gutter
+set updatetime=100
+
+" Always show column where git gutter puts diagnostics, to avoid jumpiness
+set signcolumn=yes
+
+" Use `[c` and `]c` to navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gsd :call CocAction('jumpDefinition', 'split')<CR>
+nmap <silent> gt <Plug>(coc-type-definition)
+nmap <silent> gst :call CocAction('jumpTypeDefinition', 'split')<CR>
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> ga <Plug>(coc-codeaction)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Fix autofix problem of current line
+nmap <leader>f  <Plug>(coc-fix-current)
+
+set number relativenumber
+
+" Set the terminal title
+set title
+
+" Display tabs as four spaces
+set tabstop=4
+set shiftwidth=0 " `>` and `<` keys should shift the same distance as tab key
+set noexpandtab " don't expand tabs to spaces
+
+set incsearch
+" Turn on search highlighting, the temporarily disable it for the current search
+" This resolves an issue where highlighting is turned on everytime
+" vimrc is sourced
+set hlsearch
+nohlsearch
+set wildmenu
+
+" Clear search highlighting until next search
+nmap <leader><leader> :nohlsearch<CR>
+
+" Turn on trailing comma for :ArgWrap
+let g:argwrap_tail_comma = 1
+
+function HideTerminal()
+	" Hides the terminal if it is open
+	" Hiding is preferred to closing the terminal so that
+	" the terminal session persists
+	if bufwinnr('bin/bash') > 0
+		execute bufwinnr('bin/bash') . "hide"
+	endif
+endfunction
+
+function ToggleTerminal()
+	if bufwinnr('bin/bash') > 0
+		call HideTerminal()
+	else
+		if bufnr('bin/bash') > 0
+			" if an existing terminal buffer exists, but was hidden,
+			" it should be re-used
+			execute "vert botright sbuffer " . bufnr('bin/bash')
+		else
+			" Set kill, so when Vim wants to exit or otherwise
+			" kill the terminal window, it knows how. This resolves
+			" E497 when trying to quit Vim while the terminal window
+			" is still open.
+			vert botright term ++kill=term
+		endif
+	endif
+endfunction
+
+nnoremap <leader>t :cclose <bar> :call ToggleTerminal() <CR>
+
+nnoremap <leader>e :CocList --normal --auto-preview diagnostics<CR>
+
+" yank selection into system clipboard
+vnoremap <leader>y :'<,'>w !wl-copy<CR><CR>
+
+" default netrw to tree view
+let g:netrw_liststyle = 3
+
+" --- fzf customizations ---
+" enable preview
+command! -bang -nargs=? -complete=dir FilesPreview
+    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+command! -bang -nargs=? -complete=dir GFilesPreview
+    \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
+command! -bang -nargs=* RgPreview
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+  \   fzf#vim#with_preview(), <bang>0)
+" Show all modified files, either committed and different from master, or not
+" committed. Only committed changes show a preview due to the way git diff
+" with `master...` works. It should be possible to check if the existing `git
+" diff` returns an empty string (unfortunately it returns status code 0 still
+" in this case), and use `git diff master` (without the dots) as a fallback.
+command! -bang -nargs=? ModFiles
+    \ call fzf#run(
+		\fzf#wrap('gdiff', {
+			\'source': '{ git -c color.status=always status --short --untracked-files=all | awk ''{print $2}'' && git diff --name-only master...; } | sort -u',
+			\'options': [
+				\'--preview', 'sh -c "git diff --color=always master... -- {-1} | sed 1,4d | head -500"'],
+		\}, <bang>0)
+	\)
+
+" fuzzy find files
+" https://github.com/junegunn/fzf.vim/issues/129
+nnoremap <C-p><C-p> :GFilesPreview --cached --others --exclude-standard<CR>
+" fuzzy find in contents of current buffer
+nnoremap <C-p><C-l> :BLines<CR>
+" fuzzy find in contents of all files in project
+nnoremap <C-p><C-o> :RgPreview<CR>
+" fuzzy find in previously opened files
+nnoremap <C-p><C-h> :Buffers<CR>
+" fuzzy find in modified files
+nnoremap <C-p><C-m> :ModFiles<CR>

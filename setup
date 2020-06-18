@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -e
+
+sudo pacman -S --needed networkmanager
+
+sudo pacman -S --needed gcc
+if ! [ -x "$(command -v cargo)" ]
+then
+	curl https://sh.rustup.rs -sSf | sh
+else
+	echo "detected cargo, skipping"
+fi
+mkdir -p ~/.cargo && ln -sf ~/workspace/dotfiles/config/cargo/config ~/.cargo/
+
+sudo pacman -S --needed watchexec
+
+sudo pacman -S --needed sway
+if ! [ -x "$(command -v i3status-rs)" ]
+then
+	git clone git@github.com:greshake/i3status-rust.git ~/workspace/i3status-rust
+	cargo install --path ~/workspace/i3status-rust
+else
+	echo "detected i3status-rs, skipping"
+fi
+ln -sf ~/workspace/dotfiles/config/sway ~/.config/
+
+sudo pacman -S --needed alacritty
+ln -sf ~/workspace/dotfiles/config/alacritty ~/.config/
+
+sudo pacman -S --needed fzf
+sudo pacman -S --needed ripgrep
+sudo pacman -S --needed wl-clipboard
+
+sudo pacman -S --needed light
+# needed to control backlight settings with light
+sudo usermod -aG video josh
+
+sudo pacman -S --needed pulseaudio
+sudo pacman -S --needed --asdeps pulseaudio-alsa
+
+sudo pacman -S --needed ntp
+# uncomment to update the clock
+# sudo timedatectl set-timezone "$(curl --fail https://ipapi.co/timezone)"
+# sudo ntpd -qg
+# sudo hwclock --systohc
+
+sudo pacman -S --needed vim
+# dependency of coc-vim
+sudo pacman -S --needed nodejs
+sudo pacman -S --needed --asdeps npm
+ln -sf ~/workspace/dotfiles/config/vim ~/.vim
+
+ln -sf ~/workspace/dotfiles/config/git ~/.config/
+
+sudo pacman -S --needed qutebrowser
+ln -sf ~/workspace/dotfiles/config/qutebrowser ~/.config/
+
+rm ~/.bashrc 
+rm ~/.bash_profile 
+ln -sf ~/workspace/dotfiles/config/bashrc ~/.bashrc
+ln -sf ~/workspace/dotfiles/config/bash_profile ~/.bash_profile
