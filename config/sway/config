@@ -169,6 +169,8 @@ bar {
 
     status_command i3status-rs ~/.config/sway/status.toml
 
+    font 13
+
     colors {
         background #323232
     }

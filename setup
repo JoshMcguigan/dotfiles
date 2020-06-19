@@ -25,11 +25,13 @@ fi
 ln -sf ~/workspace/dotfiles/config/sway ~/.config/
 
 sudo pacman -S --needed alacritty
+sudo pacman -S --needed ttf-anonymous-pro
 ln -sf ~/workspace/dotfiles/config/alacritty ~/.config/
 
 sudo pacman -S --needed fzf
 sudo pacman -S --needed ripgrep
 sudo pacman -S --needed wl-clipboard
+sudo pacman -S --needed bash-completion
 
 sudo pacman -S --needed light
 # needed to control backlight settings with light

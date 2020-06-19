@@ -37,6 +37,7 @@ highlight CocHintFloat ctermfg=black
 highlight CocHighlightText ctermfg=yellow
 highlight CocHoverRange ctermfg=yellow ctermbg=black
 highlight clear SignColumn
+highlight LineNr ctermfg=darkgrey
 
 " enable comments in json files for jsonc support
 autocmd FileType json syntax match Comment +\/\/.\+$+
