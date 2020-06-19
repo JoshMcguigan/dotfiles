@@ -29,9 +29,14 @@ let g:coc_global_extensions = [
 \]
 
 " colors
-highlight Pmenu ctermbg=white
-highlight CocHighlightText ctermfg=darkyellow
-highlight CocHoverRange ctermfg=none ctermbg=none
+highlight Pmenu ctermbg=white ctermfg=black
+highlight CocErrorFloat ctermfg=black
+highlight CocWarningFloat ctermfg=black
+highlight CocInfoFloat ctermfg=black
+highlight CocHintFloat ctermfg=black
+highlight CocHighlightText ctermfg=yellow
+highlight CocHoverRange ctermfg=yellow ctermbg=black
+highlight clear SignColumn
 
 " enable comments in json files for jsonc support
 autocmd FileType json syntax match Comment +\/\/.\+$+
