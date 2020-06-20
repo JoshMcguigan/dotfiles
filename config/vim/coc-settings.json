@@ -1,4 +1,5 @@
 {
 	"rust-analyzer.cargo.loadOutDirsFromCheck": true,
+	"rust-analyzer.checkOnSave.command": "clippy",
 	"python.linting.enabled": false
 }
