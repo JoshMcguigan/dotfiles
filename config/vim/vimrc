@@ -18,6 +18,10 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'FooSoft/vim-argwrap'
 
+Plug 'arcticicestudio/nord-vim'
+
+Plug 'cespare/vim-toml'
+
 call plug#end()
 
 " manage coc plugins
@@ -28,16 +32,11 @@ let g:coc_global_extensions = [
 	\ 'coc-python',
 \]
 
-" colors
-highlight Pmenu ctermbg=white ctermfg=black
-highlight CocErrorFloat ctermfg=black
-highlight CocWarningFloat ctermfg=black
-highlight CocInfoFloat ctermfg=black
-highlight CocHintFloat ctermfg=black
-highlight CocHighlightText ctermfg=yellow
-highlight CocHoverRange ctermfg=yellow ctermbg=black
-highlight clear SignColumn
-highlight LineNr ctermfg=darkgrey
+if has('termguicolors')
+	set termguicolors
+endif
+
+colorscheme nord
 
 " enable comments in json files for jsonc support
 autocmd FileType json syntax match Comment +\/\/.\+$+

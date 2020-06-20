@@ -1,29 +1,24 @@
 [theme]
-name = "bad-wolf"
-[theme.overrides]
-separator = ""
+file = "/home/josh/.config/sway/nord.toml"
 
 [[block]]
 block = "memory"
 display_type = "memory"
 format_mem = "{Mupi}%"
+warning_mem = 50
+critical_mem = 80
 
 [[block]]
 block = "cpu"
-interval = 1
+warning = 50
+critical = 80
 
 [[block]]
 block = "sound"
 
 [[block]]
 block = "battery"
-interval = 10
-format = "{percentage}%"
-# The bar goes green when the battery above the `good` value. I set
-# this value to 101 to disable this behavior.
-good = 101
 
 [[block]]
 block = "time"
-interval = 60
-format = "%a %d/%m %R"
+format = "%a %b %e %I:%M"

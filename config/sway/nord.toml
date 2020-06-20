@@ -1,0 +1,21 @@
+idle_bg = "#323232"
+idle_fg = "#D8DEE9"
+
+info_bg = "#323232"
+info_fg = "#D8DEE9"
+
+good_bg = "#323232"
+good_fg = "#D8DEE9"
+
+warning_bg = "#323232"
+warning_fg = "#EBCB8B"
+
+critical_bg = "#323232"
+critical_fg = "#BF616A"
+
+separator = ""
+separator_bg = "auto"
+separator_fg = "auto"
+
+alternating_tint_bg = "#000000"
+alternating_tint_fg = "#000000"
