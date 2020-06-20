@@ -4,7 +4,7 @@
 alias ls='ls --color=auto'
 if [ -x "$(command -v binps1)" ]
 then
-	PS1='$(binps1)'
+	PS1='$(binps1 --theme nord)'
 else
 	PS1='[\u@\h \W]\$ '
 fi
