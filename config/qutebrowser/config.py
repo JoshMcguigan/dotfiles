@@ -6,6 +6,8 @@ c = c  # type: ConfigContainer # noqa: F821 pylint: disable=E0602,C0103
 
 config.load_autoconfig()
 
+c.content.pdfjs = True
+
 c.url.default_page = 'https://raw.githubusercontent.com/qutebrowser/qutebrowser/master/doc/img/cheatsheet-big.png'
 c.url.searchengines = {'DEFAULT': 'https://www.google.com/search?hl=en&q={}'}
 c.url.start_pages = 'https://raw.githubusercontent.com/qutebrowser/qutebrowser/master/doc/img/cheatsheet-big.png'
@@ -19,6 +21,8 @@ c.window.hide_decoration = True
 
 config.bind('h', 'tab-prev')
 config.bind('l', 'tab-next')
+
+config.bind('tp', 'tab-pin')
 
 config.bind('<Ctrl-i>', 'forward')
 config.bind('<Ctrl-o>', 'back')
