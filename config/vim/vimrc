@@ -87,7 +87,7 @@ nmap <silent> gt <Plug>(coc-type-definition)
 nmap <silent> gst :call CocAction('jumpTypeDefinition', 'split')<CR>
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-nmap <silent> ga <Plug>(coc-codeaction)
+nmap <silent> ga v<Plug>(coc-codeaction-selected)
 
 " Use K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
