@@ -2,5 +2,6 @@
 	"rust-analyzer.cargo.loadOutDirsFromCheck": true,
 	"rust-analyzer.checkOnSave.command": "clippy",
 	"python.linting.enabled": false,
-	"python.jediEnabled": false
+	"python.jediEnabled": false,
+	"coc.preferences.formatOnSaveFiletypes": ["rust"]
 }
