@@ -6,8 +6,6 @@ set $up k
 set $right l
 set $term alacritty
 
-swaynag_command waysay
-
 # Use a simple terminal + fzf launcher.
 bindsym $mod+d exec $term --class launcher --command bash -c 'ls -1 $(echo $PATH | sed "s/:/ /g") | grep -v ":$" | awk "NF>0" | sort -u | fzf --layout=reverse | xargs -r swaymsg -t command exec'
 for_window [app_id="^launcher$"] floating enable
