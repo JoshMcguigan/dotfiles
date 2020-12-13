@@ -19,3 +19,5 @@ separator_fg = "auto"
 
 alternating_tint_bg = "#000000"
 alternating_tint_fg = "#000000"
+
+native_separators = true
