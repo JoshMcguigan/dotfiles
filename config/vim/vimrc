@@ -153,9 +153,9 @@ function ToggleTerminal()
 		else
 			" Set kill, so when Vim wants to exit or otherwise
 			" kill the terminal window, it knows how. This resolves
-			" E497 when trying to quit Vim while the terminal window
+			" E947 when trying to quit Vim while the terminal window
 			" is still open.
-			vert botright term ++kill=term
+			vert botright term ++kill=hup
 		endif
 	endif
 endfunction
