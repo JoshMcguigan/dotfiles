@@ -21,6 +21,8 @@ c.window.hide_decoration = True
 
 config.bind('h', 'tab-prev')
 config.bind('l', 'tab-next')
+config.bind('gl', 'tab-move -')
+config.bind('gr', 'tab-move +')
 
 config.bind('tp', 'tab-pin')
 
