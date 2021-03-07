@@ -89,6 +89,9 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 nmap <silent> ga <Plug>(coc-codeaction-cursor)
 
+" Trigger autocomplete
+inoremap <silent><expr> <c-n> coc#refresh()
+
 " Use K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
