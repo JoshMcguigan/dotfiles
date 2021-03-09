@@ -14,7 +14,6 @@ c.url.searchengines = {'DEFAULT': 'https://www.google.com/search?hl=en&q={}'}
 
 c.editor.command = ["gnome-terminal", "--wait", "--", "vim", "+call cursor({line}, {column})", "--", "{file}"]
 
-c.colors.hints.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 247, 133, 1.0), stop:1 rgba(255, 197, 66, 1.0))'
 c.window.hide_decoration = True
 
 config.bind('h', 'tab-prev')
@@ -33,3 +32,5 @@ config.bind('<Ctrl-p>', 'completion-item-focus --history prev', mode='command')
 config.bind('<Ctrl-y>', 'command-accept', mode='command')
 
 c.auto_save.session = True
+
+config.source('nord.py')
