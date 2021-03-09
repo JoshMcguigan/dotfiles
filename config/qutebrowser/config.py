@@ -8,14 +8,12 @@ config.load_autoconfig()
 
 c.content.pdfjs = True
 
-c.url.default_page = 'https://raw.githubusercontent.com/qutebrowser/qutebrowser/master/doc/img/cheatsheet-big.png'
+c.url.default_page = 'https://www.github.com'
+c.url.start_pages = c.url.default_page
 c.url.searchengines = {'DEFAULT': 'https://www.google.com/search?hl=en&q={}'}
-c.url.start_pages = 'https://raw.githubusercontent.com/qutebrowser/qutebrowser/master/doc/img/cheatsheet-big.png'
 
-# c.editor.command = ["gnome-terminal", "--wait", "--", "vim", "+call cursor({line}, {column})", "--", "{file}"]
+c.editor.command = ["gnome-terminal", "--wait", "--", "vim", "+call cursor({line}, {column})", "--", "{file}"]
 
-c.zoom.default = '140%'
-c.fonts.hints = 'bold 14pt default_family'
 c.colors.hints.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 247, 133, 1.0), stop:1 rgba(255, 197, 66, 1.0))'
 c.window.hide_decoration = True
 

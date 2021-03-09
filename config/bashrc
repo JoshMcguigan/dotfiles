@@ -1,7 +1,7 @@
-# If not running interactively, don't do anything
-[[ $- != *i* ]] && return
+# If not running interactively, don't do anything [[ $- != *i* ]] && return
 
 alias ls='ls --color=auto'
+
 if [ -x "$(command -v binps1)" ]
 then
 	PS1='$(binps1 --theme nord)'
@@ -9,7 +9,5 @@ else
 	PS1='[\u@\h \W]\$ '
 fi
 
-source ~/.fzf.bash
 source ~/workspace/dotfiles/config/fzf-bashrc
-
-export QT_QPA_PLATFORM=wayland
+source "$HOME/.cargo/env"

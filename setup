@@ -1,63 +1,60 @@
 #!/usr/bin/env bash
 set -e
 
-sudo pacman -S --needed networkmanager
+sudo pacman -Syu
 
-sudo pacman -S --needed gcc
+sudo pacman -S --needed git
+sudo pacman -S --needed base-devel
+
+ln -sf ~/workspace/dotfiles/config/bashrc ~/.bashrc
+ln -sf ~/workspace/dotfiles/config/bash_profile ~/.bash_profile
+ 
+YAY_DIR=~/workspace/yay
+if [ ! -d $YAY_DIR ]; then
+	git clone https://aur.archlinux.org/yay.git $YAY_DIR
+	cd $YAY_DIR
+	makepkg -si
+fi
+
+if ! [ -x "$(command -v gdm)" ]
+then
+	yay -S --needed gnome
+	systemctl enable gdm
+else
+	echo "detected gdm, skipping"
+fi
+yay -S --needed gnome-tweaks
+
 if ! [ -x "$(command -v cargo)" ]
 then
-	curl https://sh.rustup.rs -sSf | sh
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 else
 	echo "detected cargo, skipping"
 fi
-mkdir -p ~/.cargo && ln -sf ~/workspace/dotfiles/config/cargo/config ~/.cargo/
+ln -sf ~/workspace/dotfiles/config/cargo/config ~/.cargo/
 
-sudo pacman -S --needed watchexec
+yay -S --needed watchexec
+yay -S --needed fzf
+yay -S --needed ripgrep
+yay -S --needed wl-clipboard
+yay -S --needed bash-completion
 
-sudo pacman -S --needed sway
-if ! [ -x "$(command -v i3status-rs)" ]
-then
-	git clone git@github.com:greshake/i3status-rust.git ~/workspace/i3status-rust
-	cargo install --path ~/workspace/i3status-rust
-else
-	echo "detected i3status-rs, skipping"
-fi
-ln -sf ~/workspace/dotfiles/config/sway ~/.config/
-
-sudo pacman -S --needed alacritty
-sudo pacman -S --needed ttf-anonymous-pro
-ln -sf ~/workspace/dotfiles/config/alacritty ~/.config/
-
-sudo pacman -S --needed fzf
-sudo pacman -S --needed ripgrep
-sudo pacman -S --needed wl-clipboard
-sudo pacman -S --needed bash-completion
-
-sudo pacman -S --needed light
-# needed to control backlight settings with light
-sudo usermod -aG video josh
-
-sudo pacman -S --needed pulseaudio
-sudo pacman -S --needed --asdeps pulseaudio-alsa
-
-sudo pacman -S --needed ntp
+yay -S --needed ntp
 # uncomment to update the clock
 # sudo timedatectl set-timezone "$(curl --fail https://ipapi.co/timezone)"
 # sudo ntpd -qg
 # sudo hwclock --systohc
 
-sudo pacman -S --needed vim
+yay -S --needed vim
 # dependency of coc-vim
-sudo pacman -S --needed nodejs
-sudo pacman -S --needed --asdeps npm
+yay -S --needed nodejs
+yay -S --needed --asdeps npm
+# must delete the existing sym link, or else it will create a nested directory
+# https://unix.stackexchange.com/q/512139
+rm -rf ~/.vim
 ln -sf ~/workspace/dotfiles/config/vim ~/.vim
 
 ln -sf ~/workspace/dotfiles/config/git ~/.config/
 
-sudo pacman -S --needed qutebrowser
+yay -S --needed qutebrowser
 ln -sf ~/workspace/dotfiles/config/qutebrowser ~/.config/
-
-rm ~/.bashrc 
-rm ~/.bash_profile 
-ln -sf ~/workspace/dotfiles/config/bashrc ~/.bashrc
-ln -sf ~/workspace/dotfiles/config/bash_profile ~/.bash_profile
