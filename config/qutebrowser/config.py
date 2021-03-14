@@ -16,6 +16,8 @@ c.editor.command = ["gnome-terminal", "--wait", "--", "vim", "+call cursor({line
 
 c.window.hide_decoration = True
 
+c.fonts.hints = 'normal 12pt default_family'
+
 config.bind('h', 'tab-prev')
 config.bind('l', 'tab-next')
 config.bind('gl', 'tab-move -')
