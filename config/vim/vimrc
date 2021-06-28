@@ -45,6 +45,9 @@ autocmd FileType json syntax match Comment +\/\/.\+$+
 autocmd BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml
 autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab indentkeys-=0# indentkeys-=<:>
 
+" configure gdb
+autocmd BufNewFile,BufReadPost *.gdb set filetype=gdb
+
 nnoremap <leader>v :source $MYVIMRC<CR>
 
 " For vim-resize plugin
