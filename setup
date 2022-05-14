@@ -53,6 +53,7 @@ yay -S --needed --asdeps npm
 # https://unix.stackexchange.com/q/512139
 rm -rf ~/.vim
 ln -sf ~/workspace/dotfiles/config/vim ~/.vim
+ln -sf ~/workspace/dotfiles/config/spacemacs ~/.spacemacs
 
 ln -sf ~/workspace/dotfiles/config/git ~/.config/
 
