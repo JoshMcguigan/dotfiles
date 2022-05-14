@@ -586,6 +586,17 @@ before packages are loaded."
   ;; By default ivy will stop the search if the user tries to delete more characters
   ;; than exist in the search term.
   (setq ivy-on-del-error-function #'ignore)
+
+  ;; Remove the evil mode mappings for C-p/C-n because they overlap with shell
+  ;; behaviors (see below).
+  (define-key evil-insert-state-map (kbd "C-p") nil)
+  (define-key evil-insert-state-map (kbd "C-n") nil)
+  ;; Add specific binding to the ielm repl for prev/nex items to match bash shell behavior.
+  (add-hook 'ielm-mode-hook
+  (lambda ()
+    (define-key ielm-map (kbd "C-p") #'comint-previous-input)
+    (define-key ielm-map (kbd "C-n") #'comint-next-input)
+    ))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
