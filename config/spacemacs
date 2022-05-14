@@ -597,6 +597,34 @@ before packages are loaded."
     (define-key ielm-map (kbd "C-p") #'comint-previous-input)
     (define-key ielm-map (kbd "C-n") #'comint-next-input)
     ))
+
+  ;; Remove all bindings under the default leader key and replace them my own.
+  ((lambda ()
+     (setq my_cons (cdr spacemacs-default-map))
+     (while (car my_cons)
+       (let* (
+              (binding (car my_cons))
+              (keycode (car binding))
+              (key-str (key-description (char-to-string keycode)))
+              )
+         (spacemacs/set-leader-keys key-str nil)
+         (setq my_cons (cdr my_cons))
+         )
+       )
+
+     (spacemacs/set-leader-keys "SPC" '("commands" . counsel-M-x))
+     (spacemacs/set-leader-keys "\'" '("open shell" . spacemacs/default-pop-shell))
+     (spacemacs/set-leader-keys "g" '("git" . magit-status))
+
+     (spacemacs/declare-prefix "s" "search")
+     (spacemacs/set-leader-keys "sf" '("file" . counsel-projectile-find-file))
+
+     (spacemacs/declare-prefix "n" "navigate")
+     (spacemacs/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
+     (spacemacs/set-leader-keys "nm" '("messages" . spacemacs/switch-to-messages-buffer))
+     (spacemacs/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
+     (spacemacs/set-leader-keys "nr" '("recent" . counsel-recentf))
+     ))
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
