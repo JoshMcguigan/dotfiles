@@ -17,6 +17,10 @@ This function should only modify configuration layer settings."
                       )
      emacs-lisp
      git
+     (version-control :variables
+                      version-control-diff-tool 'git-gutter
+                      version-control-diff-side 'left
+                      )
      (ivy :variables ivy-enable-advanced-buffer-information t)
      (rust :variables
            rust-backend 'lsp)
@@ -202,23 +206,30 @@ before packages are loaded."
      (me/set-leader-keys "SPC" '("commands" . counsel-M-x))
      (me/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
      (me/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
+     (me/set-leader-keys "h" '("prev buffer" . previous-buffer))
+     (me/set-leader-keys "l" '("next buffer" . next-buffer))
      (me/set-leader-keys "t" '("file tree" . me/open-dired))
-     (me/set-leader-keys "v" '("version control" . magit-status))
      (me/set-leader-keys "w" '("save file" . save-buffer))
 
-     (me/declare-prefix "s" "search")
-     (me/set-leader-keys "sf" '("file" . counsel-projectile-find-file))
-     (me/set-leader-keys "si" '("in current file" . counsel-grep-or-swiper))
-     (me/set-leader-keys "sp" '("in current project" . counsel-projectile-rg))
+     (me/declare-prefix "f" "find")
+     (me/set-leader-keys "ff" '("file" . counsel-projectile-find-file))
+     (me/set-leader-keys "fi" '("in current file" . counsel-grep-or-swiper))
+     (me/set-leader-keys "fp" '("in current project" . counsel-projectile-rg))
 
      (me/declare-prefix "n" "navigate")
      (me/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
+     (me/set-leader-keys "nf" '("file" . counsel-find-file))
      (me/set-leader-keys "nm" '("messages" . spacemacs/switch-to-messages-buffer))
      (me/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
-     (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
      (me/set-leader-keys "nr" '("recent" . counsel-recentf))
-     (me/set-leader-keys "n[" '("prev buffer" . previous-buffer))
-     (me/set-leader-keys "n]" '("next buffer" . next-buffer))
+     (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
+
+     (me/declare-prefix "v" "vcs")
+     (me/set-leader-keys "vh" '("prev hunk" . spacemacs/vcs-previous-hunk))
+     (me/set-leader-keys "vl" '("next hunk" . spacemacs/vcs-next-hunk))
+     (me/set-leader-keys "vr" '("revert hunk" . spacemacs/vcs-revert-hunk))
+     (me/set-leader-keys "vs" '("status" . magit-status))
+     (me/set-leader-keys "vv" '("view hunk" . spacemacs/vcs-show-hunk))
 
      (bind-map me/default-map
        :prefix-cmd me-cmds
@@ -239,13 +250,14 @@ before packages are loaded."
      (spaceline-toggle-hud-off)
   ))
 
-  ;; Configured dired.
+  ;; Configure dired.
   ((lambda ()
      (evil-collection-define-key 'normal 'dired-mode-map
        "h" #'dired-up-directory
        "l" #'dired-find-file)
      (setq dired-listing-switches "-agho --group-directories-first")
   ))
+
 )
 
 (defun me/open-dired ()
@@ -303,7 +315,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ivy-rich persistent-scratch wgrep smex lsp-ivy ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy counsel-projectile counsel swiper ivy stickyfunc-enhance srefactor yasnippet-snippets xterm-color web-beautify vterm treemacs-magit toml-mode terminal-here smeargle shell-pop ron-mode racer rust-mode prettier-js npm-mode nord-theme nodejs-repl multi-term lsp-ui lsp-treemacs lsp-origami origami livid-mode skewer-mode simple-httpd json-reformat json-navigator hierarchy json-mode json-snatcher js2-refactor multiple-cursors js2-mode js-doc helm-lsp lsp-mode helm-ls-git helm-git-grep helm-company helm-c-yasnippet gitignore-templates git-timemachine git-modes git-messenger git-link fuzzy forge yaml magit ghub closql emacsql-sqlite emacsql treepy magit-section git-commit with-editor transient flycheck-rust flycheck-pos-tip pos-tip eshell-z eshell-prompt-extras esh-help company cargo markdown-mode auto-yasnippet yasnippet ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-terminal-cursor-changer evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
+   '(git-gutter-fringe fringe-helper git-gutter diff-hl browse-at-remote ivy-rich persistent-scratch wgrep smex lsp-ivy ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy counsel-projectile counsel swiper ivy stickyfunc-enhance srefactor yasnippet-snippets xterm-color web-beautify vterm treemacs-magit toml-mode terminal-here smeargle shell-pop ron-mode racer rust-mode prettier-js npm-mode nord-theme nodejs-repl multi-term lsp-ui lsp-treemacs lsp-origami origami livid-mode skewer-mode simple-httpd json-reformat json-navigator hierarchy json-mode json-snatcher js2-refactor multiple-cursors js2-mode js-doc helm-lsp lsp-mode helm-ls-git helm-git-grep helm-company helm-c-yasnippet gitignore-templates git-timemachine git-modes git-messenger git-link fuzzy forge yaml magit ghub closql emacsql-sqlite emacsql treepy magit-section git-commit with-editor transient flycheck-rust flycheck-pos-tip pos-tip eshell-z eshell-prompt-extras esh-help company cargo markdown-mode auto-yasnippet yasnippet ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-terminal-cursor-changer evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
