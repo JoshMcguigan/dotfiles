@@ -233,6 +233,18 @@ before packages are loaded."
      (spacemacs/set-leader-keys "n[" '("prev buffer" . previous-buffer))
      (spacemacs/set-leader-keys "n]" '("next buffer" . next-buffer))
      ))
+
+  ;; Configure mode-line.
+  ((lambda ()
+     (spaceline-define-segment buffer-id
+       (if (buffer-file-name)
+           (abbreviate-file-name (buffer-file-name))
+         (powerline-buffer-id)))
+     (spaceline-toggle-buffer-size-off)
+     (spaceline-toggle-purpose-off)
+     (spaceline-toggle-buffer-encoding-abbrev-off)
+     (spaceline-toggle-hud-off)
+  ))
 )
 
 (defun me/clear-spacemacs-default-map ()
