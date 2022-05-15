@@ -608,11 +608,18 @@ before packages are loaded."
     (define-key ielm-map (kbd "C-n") #'comint-next-input)
     ))
 
+  ;; Map Ctrl-Shift-V to paste while in insert mode. Out of insert mode you can
+  ;; paste with the standard vim `p`.
+  (define-key evil-insert-state-map (kbd "C-S-V") #'yank)
+  (evil-collection-define-key '(insert) 'vterm-mode-map (kbd "C-S-V") #'yank)
+
   ;; Configure projectile to find projects.
   ;;
   ;; Recursive depth limited for performance.
   (setq projectile-project-search-path '(("~/workspace" . 3)))
 
+  ;; Copy highlighted (by the mouse) text to clipboard.
+  (setq mouse-drag-copy-region t)
 
   ;; Replace all bindings under the default leader key with my own.
   ((lambda ()
@@ -622,6 +629,7 @@ before packages are loaded."
      (spacemacs/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
      (spacemacs/set-leader-keys "\'" '("open shell" . spacemacs/default-pop-shell))
      (spacemacs/set-leader-keys "v" '("version control" . magit-status))
+     (spacemacs/set-leader-keys "w" '("save file" . save-buffer))
 
      (spacemacs/declare-prefix "s" "search")
      (spacemacs/set-leader-keys "sf" '("file" . counsel-projectile-find-file))
