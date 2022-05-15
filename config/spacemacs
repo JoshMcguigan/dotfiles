@@ -9,8 +9,8 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
 
    ;; List of configuration layers to load.
-   dotspacemacs-configuration-layers
-   '(javascript
+   dotspacemacs-configuration-layers '(
+     javascript
      (auto-completion :variables
                       auto-completion-return-key-behavior 'nil
                       auto-completion-tab-key-behavior 'complete
@@ -26,7 +26,7 @@ This function should only modify configuration layer settings."
      (shell :variables
             shell-default-shell 'vterm
             shell-default-position 'full)
-     treemacs)
+     )
 
    ;; List of additional packages that will be installed without being wrapped
    ;; in a layer.
@@ -214,7 +214,8 @@ before packages are loaded."
 
      (spacemacs/set-leader-keys "SPC" '("commands" . counsel-M-x))
      (spacemacs/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
-     (spacemacs/set-leader-keys "\'" '("open shell" . spacemacs/default-pop-shell))
+     (spacemacs/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
+     (spacemacs/set-leader-keys "t" '("file tree" . me/open-dired))
      (spacemacs/set-leader-keys "v" '("version control" . magit-status))
      (spacemacs/set-leader-keys "w" '("save file" . save-buffer))
 
@@ -227,6 +228,7 @@ before packages are loaded."
      (spacemacs/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
      (spacemacs/set-leader-keys "nm" '("messages" . spacemacs/switch-to-messages-buffer))
      (spacemacs/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
+     (spacemacs/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
      (spacemacs/set-leader-keys "nr" '("recent" . counsel-recentf))
      (spacemacs/set-leader-keys "n[" '("prev buffer" . previous-buffer))
      (spacemacs/set-leader-keys "n]" '("next buffer" . next-buffer))
@@ -234,7 +236,7 @@ before packages are loaded."
 )
 
 (defun me/clear-spacemacs-default-map ()
-  "Delete all bindings in the spacemacs-default-map"
+  "Delete all bindings in the spacemacs-default-map."
   (setq my_cons (cdr spacemacs-default-map))
   (while (car my_cons)
     (let* (
@@ -245,6 +247,17 @@ before packages are loaded."
       (spacemacs/set-leader-keys key-str nil)
       (setq my_cons (cdr my_cons))
       )
+    )
+  )
+
+(defun me/open-dired ()
+  "If in a project, open dired at the project root. Otherwise open
+dired in the directory of the current buffer. If the current file
+doesn't have a name, open dired in the home directory."
+  (interactive)
+  (if (projectile-project-p)
+      (projectile-dired)
+    (dired (file-name-directory (or (buffer-file-name) "~")))
     )
   )
 
