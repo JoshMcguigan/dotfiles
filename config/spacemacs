@@ -17,7 +17,7 @@ This function should only modify configuration layer settings."
                       )
      emacs-lisp
      git
-     ivy
+     (ivy :variables ivy-enable-advanced-buffer-information t)
      (rust :variables
            rust-backend 'lsp)
      (lsp :variables
@@ -73,13 +73,10 @@ It should only modify the values of Spacemacs settings."
                                :width normal)
 
    ;; The leader key (default "SPC")
-   dotspacemacs-leader-key "SPC"
-
-   ;; The key used for Emacs commands `M-x' (after pressing on the leader key).
-   ;; (default "SPC")
-   ;;
-   ;; Note this is re-defined in user-config.
-   dotspacemacs-emacs-command-key "SPC"
+   ;; This cannot be null because spacemacs and related plugins put all their
+   ;; bindings behind it. I am using a very obscure key here to effectively
+   ;; disable it.
+   dotspacemacs-leader-key "<f35>"
 
    ;; Major mode leader key is a shortcut key which is the equivalent of
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
@@ -95,12 +92,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
-   dotspacemacs-which-key-delay 0
-
-   ;; If non-nil a progress bar is displayed when spacemacs is loading. This
-   ;; may increase the boot time on some systems and emacs builds, set it to
-   ;; nil to boost the loading time. (default t)
-   dotspacemacs-loading-progress-bar t
+   dotspacemacs-which-key-delay 0.5
 
    ;; If non-nil the frame is fullscreen when Emacs starts up. (default nil)
    ;; (Emacs 24.4+ only)
@@ -139,11 +131,6 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-
-  ;; When re-initializing the config with dotspacemacs/sync-configuration-layers
-  ;; my key bindings conflict with the defaults. Here we clear them before
-  ;; layers try to re-initialize, then reset them in dotspacemacs/user-config.
-  (me/clear-spacemacs-default-map)
 
   (setq-default git-magit-status-fullscreen t)
 
@@ -210,29 +197,35 @@ before packages are loaded."
 
   ;; Replace all bindings under the default leader key with my own.
   ((lambda ()
-     (me/clear-spacemacs-default-map)
+     (setq me/default-map (make-sparse-keymap))
 
-     (spacemacs/set-leader-keys "SPC" '("commands" . counsel-M-x))
-     (spacemacs/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
-     (spacemacs/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
-     (spacemacs/set-leader-keys "t" '("file tree" . me/open-dired))
-     (spacemacs/set-leader-keys "v" '("version control" . magit-status))
-     (spacemacs/set-leader-keys "w" '("save file" . save-buffer))
+     (me/set-leader-keys "SPC" '("commands" . counsel-M-x))
+     (me/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
+     (me/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
+     (me/set-leader-keys "t" '("file tree" . me/open-dired))
+     (me/set-leader-keys "v" '("version control" . magit-status))
+     (me/set-leader-keys "w" '("save file" . save-buffer))
 
-     (spacemacs/declare-prefix "s" "search")
-     (spacemacs/set-leader-keys "sf" '("file" . counsel-projectile-find-file))
-     (spacemacs/set-leader-keys "si" '("in current file" . counsel-grep-or-swiper))
-     (spacemacs/set-leader-keys "sp" '("in current project" . counsel-projectile-rg))
+     (me/declare-prefix "s" "search")
+     (me/set-leader-keys "sf" '("file" . counsel-projectile-find-file))
+     (me/set-leader-keys "si" '("in current file" . counsel-grep-or-swiper))
+     (me/set-leader-keys "sp" '("in current project" . counsel-projectile-rg))
 
-     (spacemacs/declare-prefix "n" "navigate")
-     (spacemacs/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
-     (spacemacs/set-leader-keys "nm" '("messages" . spacemacs/switch-to-messages-buffer))
-     (spacemacs/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
-     (spacemacs/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
-     (spacemacs/set-leader-keys "nr" '("recent" . counsel-recentf))
-     (spacemacs/set-leader-keys "n[" '("prev buffer" . previous-buffer))
-     (spacemacs/set-leader-keys "n]" '("next buffer" . next-buffer))
-     ))
+     (me/declare-prefix "n" "navigate")
+     (me/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
+     (me/set-leader-keys "nm" '("messages" . spacemacs/switch-to-messages-buffer))
+     (me/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
+     (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
+     (me/set-leader-keys "nr" '("recent" . counsel-recentf))
+     (me/set-leader-keys "n[" '("prev buffer" . previous-buffer))
+     (me/set-leader-keys "n]" '("next buffer" . next-buffer))
+
+     (bind-map me/default-map
+       :prefix-cmd me-cmds
+       :evil-keys ("SPC")
+       :override-minor-modes t
+       :override-mode-name me-leader-override-mode)
+  ))
 
   ;; Configure mode-line.
   ((lambda ()
@@ -245,22 +238,15 @@ before packages are loaded."
      (spaceline-toggle-buffer-encoding-abbrev-off)
      (spaceline-toggle-hud-off)
   ))
-)
 
-(defun me/clear-spacemacs-default-map ()
-  "Delete all bindings in the spacemacs-default-map."
-  (setq my_cons (cdr spacemacs-default-map))
-  (while (car my_cons)
-    (let* (
-           (binding (car my_cons))
-           (keycode (car binding))
-           (key-str (key-description (char-to-string keycode)))
-           )
-      (spacemacs/set-leader-keys key-str nil)
-      (setq my_cons (cdr my_cons))
-      )
-    )
-  )
+  ;; Configured dired.
+  ((lambda ()
+     (evil-collection-define-key 'normal 'dired-mode-map
+       "h" #'dired-up-directory
+       "l" #'dired-find-file)
+     (setq dired-listing-switches "-agho --group-directories-first")
+  ))
+)
 
 (defun me/open-dired ()
   "If in a project, open dired at the project root. Otherwise open
@@ -271,6 +257,38 @@ dired in the directory of the current buffer."
       (dired-jump)
     )
   )
+
+(defun me/set-leader-keys (key def &rest bindings)
+  "Add KEY and DEF as key bindings under `me/leader-key'.
+KEY should be a string suitable for passing to `kbd', and it
+should not include the leaders. DEF is most likely a quoted
+command. See `define-key' for more information about the possible
+choices for DEF. This function simply uses `define-key' to add
+the bindings.
+
+For convenience, this function will accept additional KEY DEF
+pairs. For example,
+
+\(me/set-leader-keys
+   \"a\" 'command1
+   \"C-c\" 'command2
+   \"bb\" 'command3\)
+
+This function was taken from spacemacs/set-leader-keys and
+adapted to configure my keymap."
+  (while key
+    (define-key me/default-map (kbd key) def)
+    (setq key (pop bindings) def (pop bindings))))
+
+(defun me/declare-prefix (prefix name &rest more)
+  "Declare a prefix PREFIX. PREFIX is a string describing a key
+sequence. NAME is a string used as the prefix command.
+
+This function was taken from spacemacs/declare-prefix and
+adapted to configure my keymap."
+  (declare (indent defun))
+  (apply #'which-key-add-keymap-based-replacements me/default-map
+         prefix name more))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -285,7 +303,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(persistent-scratch wgrep smex lsp-ivy ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy counsel-projectile counsel swiper ivy stickyfunc-enhance srefactor yasnippet-snippets xterm-color web-beautify vterm treemacs-magit toml-mode terminal-here smeargle shell-pop ron-mode racer rust-mode prettier-js npm-mode nord-theme nodejs-repl multi-term lsp-ui lsp-treemacs lsp-origami origami livid-mode skewer-mode simple-httpd json-reformat json-navigator hierarchy json-mode json-snatcher js2-refactor multiple-cursors js2-mode js-doc helm-lsp lsp-mode helm-ls-git helm-git-grep helm-company helm-c-yasnippet gitignore-templates git-timemachine git-modes git-messenger git-link fuzzy forge yaml magit ghub closql emacsql-sqlite emacsql treepy magit-section git-commit with-editor transient flycheck-rust flycheck-pos-tip pos-tip eshell-z eshell-prompt-extras esh-help company cargo markdown-mode auto-yasnippet yasnippet ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-terminal-cursor-changer evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
+   '(ivy-rich persistent-scratch wgrep smex lsp-ivy ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy counsel-projectile counsel swiper ivy stickyfunc-enhance srefactor yasnippet-snippets xterm-color web-beautify vterm treemacs-magit toml-mode terminal-here smeargle shell-pop ron-mode racer rust-mode prettier-js npm-mode nord-theme nodejs-repl multi-term lsp-ui lsp-treemacs lsp-origami origami livid-mode skewer-mode simple-httpd json-reformat json-navigator hierarchy json-mode json-snatcher js2-refactor multiple-cursors js2-mode js-doc helm-lsp lsp-mode helm-ls-git helm-git-grep helm-company helm-c-yasnippet gitignore-templates git-timemachine git-modes git-messenger git-link fuzzy forge yaml magit ghub closql emacsql-sqlite emacsql treepy magit-section git-commit with-editor transient flycheck-rust flycheck-pos-tip pos-tip eshell-z eshell-prompt-extras esh-help company cargo markdown-mode auto-yasnippet yasnippet ac-ispell auto-complete ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired treemacs-evil toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation hide-comnt helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-terminal-cursor-changer evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr elisp-slime-nav elisp-def editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish devdocs define-word column-enforce-mode clean-aindent-mode centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
