@@ -264,12 +264,11 @@ before packages are loaded."
 
 (defun me/open-dired ()
   "If in a project, open dired at the project root. Otherwise open
-dired in the directory of the current buffer. If the current file
-doesn't have a name, open dired in the home directory."
+dired in the directory of the current buffer."
   (interactive)
   (if (projectile-project-p)
       (projectile-dired)
-    (dired (file-name-directory (or (buffer-file-name) "~")))
+      (dired-jump)
     )
   )
 
