@@ -161,15 +161,12 @@ before packages are loaded."
   (setq-default rust-format-on-save t)
 
   ;; Automatically refresh the configuration anytime it is updated.
-  ;;
-  ;; TODO
-  ;; This doesn't handle if you open a symlinked version of the file, or if the user
-  ;; has their config at ~/.spacemacs.d/init.el
   (add-hook 'after-save-hook (lambda ()
-                               (if (string= (expand-file-name "~/.spacemacs") buffer-file-name)
-                                    (dotspacemacs/sync-configuration-layers)
-                                   )
-                               ))
+    ;; This file is sym linked to `~/.spacemacs`.
+    (if (string= (expand-file-name "~/workspace/dotfiles/config/spacemacs") buffer-file-name)
+        (dotspacemacs/sync-configuration-layers)
+    )
+  ))
 
   ;; By default ivy will stop the search if the user tries to delete more characters
   ;; than exist in the search term.
