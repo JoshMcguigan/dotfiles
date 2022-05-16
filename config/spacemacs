@@ -167,6 +167,13 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
+  ;; Automatically save the state of tabs/buffers when closing emacs, and
+  ;; restore when re-opening.
+  (add-hook 'spacemacs-post-user-config-hook
+            (lambda ()
+              (desktop-save-mode)
+              (desktop-read)))
+
   (setq-default rust-format-on-save t)
 
   (setq-default indent-tabs-mode nil
@@ -250,6 +257,16 @@ before packages are loaded."
        :override-minor-modes t
        :override-mode-name me-leader-override-mode)
   ))
+
+  ;; Setup shortcuts to manage the tab bar.
+  ((lambda ()
+     (bind-key* (kbd "M-<return>") #'tab-new)
+     (bind-key* (kbd "M-l") #'tab-next)
+     (bind-key* (kbd "M-h") #'tab-previous)
+     (bind-key* (kbd "M-L") #'tab-bar-move-tab)
+     (bind-key* (kbd "M-H") #'tab-bar-move-tab-backward)
+     (bind-key* (kbd "M-q") #'tab-close)
+     ))
 
   ;; Configure n/N to scroll through more than just search results.
   ;;
