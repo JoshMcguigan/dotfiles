@@ -202,16 +202,24 @@ before packages are loaded."
      (me/set-leader-keys "SPC" '("commands" . counsel-M-x))
      (me/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
      (me/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
-     (me/set-leader-keys "h" '("prev buffer" . previous-buffer))
-     (me/set-leader-keys "l" '("next buffer" . next-buffer))
+     (me/set-leader-keys "b" '("prev buffer" . previous-buffer))
+     (me/set-leader-keys "B" '("next buffer" . next-buffer))
+     (me/set-leader-keys "h" '("next hunk" . spacemacs/vcs-next-hunk))
+     (me/set-leader-keys "H" '("prev hunk" . spacemacs/vcs-previous-hunk))
      (me/set-leader-keys "t" '("file tree (project)" . me/open-dired))
      (me/set-leader-keys "T" '("file tree (current dir)" . dired-jump))
      (me/set-leader-keys "w" '("save file" . save-buffer))
 
      (me/declare-prefix "f" "find")
+     ;; TODO add fF and fP which search in project directory but without
+     ;;      checking gitignore
      (me/set-leader-keys "ff" '("file" . counsel-projectile-find-file))
      (me/set-leader-keys "fi" '("in current file" . counsel-grep-or-swiper))
      (me/set-leader-keys "fp" '("in current project" . counsel-projectile-rg))
+
+     ;; Save l for local mappings (per project or on a local machine)
+
+     ;; Save m for major mode
 
      (me/declare-prefix "n" "navigate")
      (me/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
@@ -222,8 +230,6 @@ before packages are loaded."
      (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
 
      (me/declare-prefix "v" "vcs")
-     (me/set-leader-keys "vh" '("prev hunk" . spacemacs/vcs-previous-hunk))
-     (me/set-leader-keys "vl" '("next hunk" . spacemacs/vcs-next-hunk))
      (me/set-leader-keys "vr" '("revert hunk" . spacemacs/vcs-revert-hunk))
      (me/set-leader-keys "vs" '("status" . magit-status))
      (me/set-leader-keys "vv" '("view hunk" . spacemacs/vcs-show-hunk))
@@ -233,6 +239,48 @@ before packages are loaded."
        :evil-keys ("SPC")
        :override-minor-modes t
        :override-mode-name me-leader-override-mode)
+  ))
+
+  ;; Configure n/N to scroll through more than just search results.
+  ;;
+  ;; TODO for hunks this needs to consider/remember the direction
+  ;; that the user started in.
+  ((lambda ()
+      (symbol-name 'me/navigate-active-search)
+      (symbol-name 'me/navigate-active-hunks)
+      ;; Default to assuming a search is active, as that should
+      ;; be safe at startup.
+      (setq-default me/navigate-active 'me/navigate-active-search)
+
+      (defun me/trace-search (&rest args)
+        (setq me/navigate-active 'me/navigate-active-search)
+      )
+      (advice-add 'evil-ex-start-search :before #'me/trace-search)
+
+      (defun me/trace-hunk (&rest args)
+        (setq me/navigate-active 'me/navigate-active-hunks)
+      )
+      (advice-add 'spacemacs/vcs-previous-hunk :before #'me/trace-hunk)
+      (advice-add 'spacemacs/vcs-next-hunk :before #'me/trace-hunk)
+
+      (define-key evil-normal-state-map (kbd "n") (defun me/navigate-next ()
+                                                    (interactive)
+                                                    (case me/navigate-active
+                                                      ('me/navigate-active-search (evil-ex-search-next))
+                                                      ('me/navigate-active-hunks (spacemacs/vcs-next-hunk))
+                                                      (t nil)
+                                                      )
+                                                    )
+        )
+      (define-key evil-normal-state-map (kbd "N") (defun me/navigate-previous ()
+                                                    (interactive)
+                                                    (case me/navigate-active
+                                                      ('me/navigate-active-search (evil-ex-search-previous))
+                                                      ('me/navigate-active-hunks (spacemacs/vcs-previous-hunk))
+                                                      (t nil)
+                                                      )
+                                                    )
+        )
   ))
 
   ;; Configure mode-line.
