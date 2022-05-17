@@ -229,8 +229,8 @@ before packages are loaded."
      (me/set-leader-keys "fi" '("in current file" . counsel-grep-or-swiper))
      (me/set-leader-keys "fp" '("in current project" . counsel-projectile-rg))
 
-     (me/set-leader-keys "h" '("next hunk" . spacemacs/vcs-next-hunk))
-     (me/set-leader-keys "H" '("prev hunk" . spacemacs/vcs-previous-hunk))
+     (me/set-leader-keys "h" '("next hunk" . me/vcs-next-hunk))
+     (me/set-leader-keys "H" '("prev hunk" . me/vcs-previous-hunk))
 
      ;; Save l for local mappings (per project or on a local machine)
      ;; Save m for major mode
@@ -289,9 +289,6 @@ before packages are loaded."
      ))
 
   ;; Configure n/N to scroll through more than just search results.
-  ;;
-  ;; TODO for hunks this needs to consider/remember the direction
-  ;; that the user started in.
   ((lambda ()
       (symbol-name 'me/navigate-active-search)
       (symbol-name 'me/navigate-active-hunks)
@@ -299,35 +296,68 @@ before packages are loaded."
       ;; be safe at startup.
       (setq-default me/navigate-active 'me/navigate-active-search)
 
+      ;; We track the direction the user is navigating (for example
+      ;; did they use next-hunk or previous-hunk) and make n/N behave
+      ;; appropriately.
+      ;;
+      ;; For search mode, this variable value is unused because
+      ;; evil tracks this for us.
+      (symbol-name 'me/navigate-forward)
+      (symbol-name 'me/navigate-reverse)
+      (setq-default me/navigate-direction 'me/navigate-forward)
+
       (defun me/trace-search (&rest args)
         (setq me/navigate-active 'me/navigate-active-search)
-      )
+        ;; Evil tracks this for us.
+        (setq me/navigate-direction nil)
+        )
       (advice-add 'evil-ex-start-search :before #'me/trace-search)
 
-      (defun me/trace-hunk (&rest args)
+      (defun me/vcs-next-hunk ()
+        "Wrapper function around spacemacs/vcs-*-hunk to track
+that we are navigating through hunks in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
         (setq me/navigate-active 'me/navigate-active-hunks)
-      )
-      (advice-add 'spacemacs/vcs-previous-hunk :before #'me/trace-hunk)
-      (advice-add 'spacemacs/vcs-next-hunk :before #'me/trace-hunk)
+        (setq me/navigate-direction 'me/navigate-forward)
+        (spacemacs/vcs-next-hunk))
 
-      (define-key evil-normal-state-map (kbd "n") (defun me/navigate-next ()
-                                                    (interactive)
-                                                    (case me/navigate-active
-                                                      ('me/navigate-active-search (evil-ex-search-next))
-                                                      ('me/navigate-active-hunks (spacemacs/vcs-next-hunk))
-                                                      (t nil)
-                                                      )
-                                                    )
-        )
-      (define-key evil-normal-state-map (kbd "N") (defun me/navigate-previous ()
-                                                    (interactive)
-                                                    (case me/navigate-active
-                                                      ('me/navigate-active-search (evil-ex-search-previous))
-                                                      ('me/navigate-active-hunks (spacemacs/vcs-previous-hunk))
-                                                      (t nil)
-                                                      )
-                                                    )
-        )
+      (defun me/vcs-previous-hunk ()
+        "Wrapper function around spacemacs/vcs-*-hunk to track
+that we are navigating through hunks in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-hunks)
+        (setq me/navigate-direction 'me/navigate-reverse)
+        (spacemacs/vcs-previous-hunk))
+
+      (define-key evil-normal-state-map (kbd "n")
+        (defun me/navigate-next ()
+          (interactive)
+          (case me/navigate-active
+            ('me/navigate-active-search (evil-ex-search-next))
+            ('me/navigate-active-hunks
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (spacemacs/vcs-next-hunk)
+               (spacemacs/vcs-previous-hunk))
+             )
+            (t nil))))
+
+      (define-key evil-normal-state-map (kbd "N")
+        (defun me/navigate-previous ()
+          (interactive)
+          (case me/navigate-active
+            ('me/navigate-active-search (evil-ex-search-previous))
+            ('me/navigate-active-hunks
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (spacemacs/vcs-previous-hunk)
+               (spacemacs/vcs-next-hunk))
+             )
+            (t nil))))
   ))
 
   ;; Configure mode-line.
