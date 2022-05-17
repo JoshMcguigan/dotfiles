@@ -221,14 +221,6 @@ before packages are loaded."
      (me/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
      (me/set-leader-keys "b" '("prev buffer" . previous-buffer))
      (me/set-leader-keys "B" '("next buffer" . next-buffer))
-     (me/set-leader-keys "h" '("next hunk" . spacemacs/vcs-next-hunk))
-     (me/set-leader-keys "H" '("prev hunk" . spacemacs/vcs-previous-hunk))
-     (me/set-leader-keys "q" '("close window" . evil-quit))
-     (me/set-leader-keys "r" '("recent files" . counsel-recentf))
-     (me/set-leader-keys "R" '("buffers" . counsel-ibuffer))
-     (me/set-leader-keys "t" '("file tree (project)" . me/open-dired))
-     (me/set-leader-keys "T" '("file tree (current dir)" . dired-jump))
-     (me/set-leader-keys "w" '("save file" . save-buffer))
 
      (me/declare-prefix "f" "find")
      ;; TODO add fF and fP which search in project directory but without
@@ -237,8 +229,10 @@ before packages are loaded."
      (me/set-leader-keys "fi" '("in current file" . counsel-grep-or-swiper))
      (me/set-leader-keys "fp" '("in current project" . counsel-projectile-rg))
 
-     ;; Save l for local mappings (per project or on a local machine)
+     (me/set-leader-keys "h" '("next hunk" . spacemacs/vcs-next-hunk))
+     (me/set-leader-keys "H" '("prev hunk" . spacemacs/vcs-previous-hunk))
 
+     ;; Save l for local mappings (per project or on a local machine)
      ;; Save m for major mode
 
      (me/declare-prefix "n" "navigate")
@@ -248,10 +242,25 @@ before packages are loaded."
      (me/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
      (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
 
+     (me/set-leader-keys "q" '("close window" . evil-quit))
+     (me/set-leader-keys "r" '("recent files" . counsel-recentf))
+     (me/set-leader-keys "R" '("buffers" . counsel-ibuffer))
+
+     (me/declare-prefix "s" "split")
+     (me/set-leader-keys "sh" '("split left" . split-window-right))
+     (me/set-leader-keys "sj" '("split up" . split-window-below))
+     (me/set-leader-keys "sk" '("split down" . split-window-below-and-focus))
+     (me/set-leader-keys "sl" '("split right" . split-window-right-and-focus))
+
+     (me/set-leader-keys "t" '("file tree (project)" . me/open-dired))
+     (me/set-leader-keys "T" '("file tree (current dir)" . dired-jump))
+
      (me/declare-prefix "v" "vcs")
      (me/set-leader-keys "vr" '("revert hunk" . spacemacs/vcs-revert-hunk))
      (me/set-leader-keys "vs" '("status" . magit-status))
      (me/set-leader-keys "vv" '("view hunk" . spacemacs/vcs-show-hunk))
+
+     (me/set-leader-keys "w" '("save file" . save-buffer))
 
      (bind-map me/default-map
        :prefix-cmd me-cmds
