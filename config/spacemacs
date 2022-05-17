@@ -382,6 +382,9 @@ is closed."
                ))
             ))))
       ))
+
+  ;; Prompt before exiting emacs.
+  (setq confirm-kill-emacs 'y-or-n-p)
 )
 
 (defun me/open-dired ()
