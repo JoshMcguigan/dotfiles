@@ -223,6 +223,7 @@ before packages are loaded."
      (me/set-leader-keys "B" '("next buffer" . next-buffer))
      (me/set-leader-keys "h" '("next hunk" . spacemacs/vcs-next-hunk))
      (me/set-leader-keys "H" '("prev hunk" . spacemacs/vcs-previous-hunk))
+     (me/set-leader-keys "q" '("close window" . evil-quit))
      (me/set-leader-keys "r" '("recent files" . counsel-recentf))
      (me/set-leader-keys "R" '("buffers" . counsel-ibuffer))
      (me/set-leader-keys "t" '("file tree (project)" . me/open-dired))
@@ -261,11 +262,20 @@ before packages are loaded."
 
   ;; Setup shortcuts to manage the tab bar.
   ((lambda ()
+     ;; Trying both of these to see which I prefer.
+     ;;
+     ;; Consider moving leader-return up to the rest of the
+     ;; leader mappings if I decide to keep it.
      (bind-key* (kbd "M-<return>") #'tab-new)
+     (me/set-leader-keys "<return>" '("new tab" . tab-new))
+
      (bind-key* (kbd "M-l") #'tab-next)
      (bind-key* (kbd "M-h") #'tab-previous)
      (bind-key* (kbd "M-L") #'tab-bar-move-tab)
      (bind-key* (kbd "M-H") #'tab-bar-move-tab-backward)
+
+     ;; Evaluate whether this is needed given I have leader-q mapped
+     ;; to something similar.
      (bind-key* (kbd "M-q") #'tab-close)
      ))
 
@@ -331,6 +341,38 @@ before packages are loaded."
      (setq dired-listing-switches "-agho --group-directories-first")
   ))
 
+  ;; Override the standard `evil-quit` function to handle closing
+  ;; a tab before closing emacs. See the issue link below.
+  ;;
+  ;; https://github.com/emacs-evil/evil/issues/1624
+  (evil-define-command evil-quit (&optional force)
+    "Closes the current window, current frame, current tab, Emacs.
+If the current frame belongs to some client the client connection
+is closed."
+    :repeat nil
+    (interactive "<!>")
+    (condition-case nil
+        (delete-window)
+      (error
+       (if (and (boundp 'server-buffer-clients)
+                (fboundp 'server-edit)
+                (fboundp 'server-buffer-done)
+                server-buffer-clients)
+           (if force
+               (server-buffer-done (current-buffer))
+             (server-edit))
+         (condition-case nil
+             (delete-frame)
+           (error
+            (condition-case nil
+                (tab-bar-close-tab)
+              (error
+               (if force
+                   (kill-emacs)
+                 (save-buffers-kill-emacs))
+               ))
+            ))))
+      ))
 )
 
 (defun me/open-dired ()
