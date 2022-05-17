@@ -242,6 +242,9 @@ before packages are loaded."
      (me/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
      (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
 
+     (me/set-leader-keys "o" '("open file" . find-file))
+     ;; TODO map O to a nice open remote file helper
+
      (me/set-leader-keys "q" '("close window" . evil-quit))
 
      (me/set-leader-keys "r" '("recent files" . counsel-recentf))
