@@ -243,13 +243,14 @@ before packages are loaded."
      (me/set-leader-keys "ns" '("scratch" . spacemacs/switch-to-scratch-buffer))
 
      (me/set-leader-keys "q" '("close window" . evil-quit))
+
      (me/set-leader-keys "r" '("recent files" . counsel-recentf))
      (me/set-leader-keys "R" '("buffers" . counsel-ibuffer))
 
      (me/declare-prefix "s" "split")
      (me/set-leader-keys "sh" '("split left" . split-window-right))
-     (me/set-leader-keys "sj" '("split up" . split-window-below))
-     (me/set-leader-keys "sk" '("split down" . split-window-below-and-focus))
+     (me/set-leader-keys "sj" '("split down" . split-window-below-and-focus))
+     (me/set-leader-keys "sk" '("split up" . split-window-below))
      (me/set-leader-keys "sl" '("split right" . split-window-right-and-focus))
 
      (me/set-leader-keys "t" '("file tree (project)" . me/open-dired))
