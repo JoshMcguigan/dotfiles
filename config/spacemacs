@@ -450,6 +450,16 @@ is closed."
   ;; Prompt before exiting emacs.
   (setq confirm-kill-emacs 'y-or-n-p)
 
+  ;; Configure org-babel.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '(
+     (emacs-lisp . t)
+     (python . t)
+     (shell . t)
+     ))
+  (setq org-confirm-babel-evaluate nil)
+
   ;; Load a local configuration file if it exists. This is used
   ;; to add machine specific setup that I don't want to commit
   ;; to git.
