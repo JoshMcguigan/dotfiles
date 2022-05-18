@@ -222,8 +222,8 @@ before packages are loaded."
      (me/set-leader-keys "b" '("buffers" . buffer-menu))
      (me/set-leader-keys "B" '("recent files" . counsel-recentf))
 
-     (me/set-leader-keys "e" '("next error" . me/next-error))
-     (me/set-leader-keys "E" '("prev error" . me/previous-error))
+     (me/set-leader-keys "e" '("next error" . me/traced-next-error))
+     (me/set-leader-keys "E" '("prev error" . me/traced-previous-error))
 
      (me/declare-prefix "f" "find")
      ;; TODO add fF and fP which search in project directory but without
@@ -232,8 +232,8 @@ before packages are loaded."
      (me/set-leader-keys "fi" '("in current file" . counsel-grep-or-swiper))
      (me/set-leader-keys "fp" '("in current project" . counsel-projectile-rg))
 
-     (me/set-leader-keys "h" '("next hunk" . me/vcs-next-hunk))
-     (me/set-leader-keys "H" '("prev hunk" . me/vcs-previous-hunk))
+     (me/set-leader-keys "h" '("next hunk" . me/traced-vcs-next-hunk))
+     (me/set-leader-keys "H" '("prev hunk" . me/traced-vcs-previous-hunk))
 
      ;; Save l for local mappings (per project or on a local machine)
      ;; Save m for major mode
@@ -289,6 +289,7 @@ before packages are loaded."
   ((lambda ()
       (symbol-name 'me/navigate-active-search)
       (symbol-name 'me/navigate-active-hunks)
+      (symbol-name 'me/navigate-active-errors)
       ;; Default to assuming a search is active, as that should
       ;; be safe at startup.
       (setq-default me/navigate-active 'me/navigate-active-search)
@@ -310,7 +311,7 @@ before packages are loaded."
         )
       (advice-add 'evil-ex-start-search :before #'me/trace-search)
 
-      (defun me/vcs-next-hunk ()
+      (defun me/traced-vcs-next-hunk ()
         "Wrapper function around spacemacs/vcs-*-hunk to track
 that we are navigating through hunks in a particular direction. Any
 interactive user should use this function, but the underlying nagivate-*
@@ -321,7 +322,7 @@ me/navigation-direciton."
         (setq me/navigate-direction 'me/navigate-forward)
         (spacemacs/vcs-next-hunk))
 
-      (defun me/vcs-previous-hunk ()
+      (defun me/traced-vcs-previous-hunk ()
         "Wrapper function around spacemacs/vcs-*-hunk to track
 that we are navigating through hunks in a particular direction. Any
 interactive user should use this function, but the underlying nagivate-*
@@ -332,6 +333,28 @@ me/navigation-direciton."
         (setq me/navigate-direction 'me/navigate-reverse)
         (spacemacs/vcs-previous-hunk))
 
+      (defun me/traced-next-error ()
+        "Wrapper function around me/*-error to track
+that we are navigating through errors in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-errors)
+        (setq me/navigate-direction 'me/navigate-forward)
+        (me/next-error))
+
+      (defun me/traced-previous-error ()
+        "Wrapper function around me/*-error to track
+that we are navigating through errors in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-errors)
+        (setq me/navigate-direction 'me/navigate-reverse)
+        (me/previous-error))
+
       (define-key evil-normal-state-map (kbd "n")
         (defun me/navigate-next ()
           (interactive)
@@ -341,6 +364,11 @@ me/navigation-direciton."
              (if (eq me/navigate-direction 'me/navigate-forward)
                  (spacemacs/vcs-next-hunk)
                (spacemacs/vcs-previous-hunk))
+             )
+            ('me/navigate-active-errors
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (me/next-error)
+               (me/previous-error))
              )
             (t nil))))
 
@@ -353,6 +381,11 @@ me/navigation-direciton."
              (if (eq me/navigate-direction 'me/navigate-forward)
                  (spacemacs/vcs-previous-hunk)
                (spacemacs/vcs-next-hunk))
+             )
+            ('me/navigate-active-errors
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (me/previous-error)
+               (me/next-error))
              )
             (t nil))))
   ))
