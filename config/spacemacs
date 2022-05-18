@@ -240,6 +240,7 @@ before packages are loaded."
 
      (me/declare-prefix "n" "navigate")
      (me/set-leader-keys "nc" '("spacemacs config" . spacemacs/find-dotfile))
+     (me/set-leader-keys "nC" '("local config" . me/find-local-config))
      (me/set-leader-keys "nf" '("file" . counsel-find-file))
      (me/set-leader-keys "nm" '("messages" . spacemacs/switch-to-messages-buffer))
      (me/set-leader-keys "np" '("project" . counsel-projectile-switch-project))
@@ -445,7 +446,19 @@ is closed."
 
   ;; Prompt before exiting emacs.
   (setq confirm-kill-emacs 'y-or-n-p)
+
+  ;; Load a local configuration file if it exists. This is used
+  ;; to add machine specific setup that I don't want to commit
+  ;; to git.
+  (when (file-exists-p me/local-config-file) (load-file me/local-config-file))
 )
+
+(setq me/local-config-file "~/.emacs-local-config.el")
+
+(defun me/find-local-config ()
+  "Edit the local emacs configuration, in the current window."
+  (interactive)
+  (find-file me/local-config-file))
 
 (defun me/open-dired ()
   "If in a project, open dired at the project root. Otherwise open
