@@ -267,6 +267,9 @@ before packages are loaded."
 
      (me/set-leader-keys "w" '("save file" . save-buffer))
 
+     (me/declare-prefix "y" "copy")
+     (me/set-leader-keys "yg" '("git forge link" . spacemacs/git-link-copy-url-only))
+
      (bind-map me/default-map
        :prefix-cmd me-cmds
        :evil-keys ("SPC")
