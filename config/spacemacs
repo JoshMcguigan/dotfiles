@@ -227,7 +227,7 @@ before packages are loaded."
   ((lambda ()
      (setq me/default-map (make-sparse-keymap))
 
-     (me/set-leader-keys "SPC" '("commands" . counsel-M-x))
+     (me/set-leader-keys "SPC" '("commands" . (lambda () (interactive) (counsel-M-x ""))))
      (me/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
      (me/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
      (me/set-leader-keys "b" '("buffers" . (lambda () (interactive) (buffer-menu 1))))
