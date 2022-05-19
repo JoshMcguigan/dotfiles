@@ -515,6 +515,9 @@ is closed."
   ;; to add machine specific setup that I don't want to commit
   ;; to git.
   (when (file-exists-p me/local-config-file) (load-file me/local-config-file))
+
+  ;; Suppress native comp from popping up the warnings buffer.
+  (setq native-comp-async-report-warnings-errors 'silent)
 )
 
 (setq me/local-config-file "~/.emacs-local-config.el")
