@@ -454,6 +454,46 @@ is closed."
             ))))
       ))
 
+  ;; Override the standard `evil-ret-gen` function to handle
+  ;; opening buffers from buffer-menu. See the issue link below.
+  ;;
+  ;; https://github.com/emacs-evil/evil-collection/issues/631
+  (defun evil-ret-gen (count indent?)
+    (let* ((field  (get-char-property (point) 'field))
+          (button (get-char-property (point) 'button))
+          (doc    (get-char-property (point) 'widget-doc))
+          (widget (or field button doc)))
+      (cond
+      ((and widget
+            (fboundp 'widget-type)
+            (fboundp 'widget-button-press)
+            (or (and (symbolp widget)
+                      (get widget 'widget-type))
+                (and (consp widget)
+                      (get (widget-type widget) 'widget-type))))
+        (when (evil-operator-state-p)
+          (setq evil-inhibit-operator t))
+        (when (fboundp 'widget-button-press)
+          (widget-button-press (point))))
+      ((and (fboundp 'button-at)
+            (fboundp 'push-button)
+            (button-at (point)))
+        (when (evil-operator-state-p)
+          (setq evil-inhibit-operator t))
+        (push-button))
+      ((or (evil-emacs-state-p)
+            (and (evil-insert-state-p)
+                (not buffer-read-only)))
+        (if (not indent?)
+            (newline count)
+          (delete-horizontal-space t)
+          (newline count)
+          (indent-according-to-mode)))
+      ((eq 'Buffer-menu-mode major-mode)
+        (Buffer-menu-this-window))
+      (t
+        (evil-next-line-first-non-blank count)))))
+
   ;; Prompt before exiting emacs.
   (setq confirm-kill-emacs 'y-or-n-p)
 
