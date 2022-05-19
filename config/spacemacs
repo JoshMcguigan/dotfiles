@@ -13,7 +13,7 @@ This function should only modify configuration layer settings."
      yaml
      javascript
      (c-c++ :variables
-            c-c++-backend 'lsp-clangd
+            c-c++-backend 'lsp-ccls
             c-c++-lsp-enable-semantic-highlight t
             )
 

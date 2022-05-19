@@ -11,3 +11,8 @@
 
 # --- Python ---
 .mypy_cache
+
+# --- C ---
+.cache
+.ccls-cache
+compile_commands.json
