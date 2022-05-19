@@ -229,7 +229,7 @@ before packages are loaded."
 
      (me/set-leader-keys "SPC" '("commands" . (lambda () (interactive) (counsel-M-x ""))))
      (me/set-leader-keys "TAB" '("last buffer" . spacemacs/alternate-buffer))
-     (me/set-leader-keys "\'" '("shell" . spacemacs/default-pop-shell))
+     (me/set-leader-keys "\'" '("shell" . vterm))
      (me/set-leader-keys "b" '("buffers" . (lambda () (interactive) (buffer-menu 1))))
      (me/set-leader-keys "B" '("buffers (all)" . buffer-menu))
 
