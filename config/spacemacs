@@ -520,7 +520,7 @@ is closed."
   (setq native-comp-async-report-warnings-errors 'silent)
 
   ;; Update org mode bullets.
-  (setq org-superstar-headline-bullets-list '(?🞛 ?◉ ?○))
+  (setq org-superstar-headline-bullets-list '(?◉ ?○))
   (setq org-superstar-cycle-headline-bullets nil)
 )
 
