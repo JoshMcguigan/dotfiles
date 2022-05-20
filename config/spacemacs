@@ -518,6 +518,10 @@ is closed."
 
   ;; Suppress native comp from popping up the warnings buffer.
   (setq native-comp-async-report-warnings-errors 'silent)
+
+  ;; Update org mode bullets.
+  (setq org-superstar-headline-bullets-list '(?🞛 ?◉ ?○))
+  (setq org-superstar-cycle-headline-bullets nil)
 )
 
 (setq me/local-config-file "~/.emacs-local-config.el")
