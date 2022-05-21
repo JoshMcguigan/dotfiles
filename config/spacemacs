@@ -439,6 +439,8 @@ me/navigation-direciton."
                (me/previous-error))
              )
             (t nil))))
+      (apply #'evil-set-command-properties #'me/navigate-next
+             (evil-get-command-properties #'evil-ex-search-next))
 
       (define-key evil-normal-state-map (kbd "N")
         (defun me/navigate-previous ()
@@ -456,6 +458,8 @@ me/navigation-direciton."
                (me/next-error))
              )
             (t nil))))
+      (apply #'evil-set-command-properties #'me/navigate-previous
+             (evil-get-command-properties #'evil-ex-search-previous))
   ))
 
   ;; Configure dired.
