@@ -81,8 +81,9 @@ It should only modify the values of Spacemacs settings."
                          nord
                         )
 
-   ;; Set the theme for the Spaceline.
-   dotspacemacs-mode-line-theme '(spacemacs :separator arrow :separator-scale 1.5)
+   ;; See spaceline-custom-theme defined in dotspacemacs/user-init
+   ;; for the definition of the custom theme.
+   dotspacemacs-mode-line-theme 'custom
 
    ;; Default font or prioritized list of fonts.
    dotspacemacs-default-font '("Source Code Pro"
@@ -161,6 +162,38 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; https://github.com/emacs-evil/evil-collection/issues/631
   (with-eval-after-load 'evil-collection-buff-menu
     (defun evil-collection-buff-menu-setup() ()))
+
+  ;; Specify custom modeline.
+  (defun spaceline-custom-theme (&rest additional-segments)
+    (spaceline-compile
+      `(
+        (evil-state
+         :face highlight-face
+         :priority 100)
+        ;; anzu displays the state of the active search.
+        ;; TODO wrap this to show state of whatever we are n/N scrolling through.
+        (anzu :priority 95)
+        ((me/buffer-modified me/buffer-id)
+         :priority 98)
+        (major-mode :priority 79)
+        (minor-modes
+         :when active
+         :priority 9)
+        (me/version-control
+         :when active
+         :priority 78)
+        )
+      `(
+        (selection-info :priority 95)
+        ;; global is used to display lsp status.
+        (global :when active)
+        (line-column
+         :priority 96)
+        ,@additional-segments
+        (buffer-position :priority 99)
+        ))
+
+    (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
 )
 
 
@@ -178,6 +211,20 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
+  ;; Configure mode-line.
+  (spaceline-define-segment me/buffer-id
+    (if (buffer-file-name)
+        (abbreviate-file-name (buffer-file-name))
+      (powerline-buffer-id)))
+  (spaceline-define-segment me/buffer-modified
+    (if (buffer-modified-p)
+        "\*" " "))
+  (spaceline-define-segment me/version-control
+    (when vc-mode
+      (powerline-raw
+       (replace-regexp-in-string "^ Git:" "" vc-mode))))
+
 
   ;; Automatically save the state of tabs/buffers when closing emacs, and
   ;; restore when re-opening.
@@ -403,18 +450,6 @@ me/navigation-direciton."
                (me/next-error))
              )
             (t nil))))
-  ))
-
-  ;; Configure mode-line.
-  ((lambda ()
-     (spaceline-define-segment buffer-id
-       (if (buffer-file-name)
-           (abbreviate-file-name (buffer-file-name))
-         (powerline-buffer-id)))
-     (spaceline-toggle-buffer-size-off)
-     (spaceline-toggle-purpose-off)
-     (spaceline-toggle-buffer-encoding-abbrev-off)
-     (spaceline-toggle-hud-off)
   ))
 
   ;; Configure dired.
