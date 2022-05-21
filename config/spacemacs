@@ -215,7 +215,13 @@ before packages are loaded."
   ;; Configure mode-line.
   (spaceline-define-segment me/buffer-id
     (if (buffer-file-name)
-        (abbreviate-file-name (buffer-file-name))
+        (me/shorten-filepath
+         (abbreviate-file-name (buffer-file-name))
+         ;; Margin seems to be roughly the number of
+         ;; character taken up by the things in the
+         ;; modeline which are higher priority than
+         ;; the file path.
+         (let ((margin 20))(- (window-width) margin)))
       (powerline-buffer-id)))
   (spaceline-define-segment me/buffer-modified
     (if (buffer-modified-p)
@@ -644,6 +650,45 @@ the file to find the previous error (if needed)."
         (error (evil-goto-line) (spacemacs/previous-error))
         )
     ))
+
+(defun me/shorten-filepath (filepath max-length)
+  "Given a FILEPATH, shorten it for display purposes
+to no longer than MAX-LENGTH (on a best effort basis)
+by abbreviating directories to a single letter."
+  (let ((current-length (length filepath)))
+    (string-join
+     (mapcar
+      (lambda (ss)
+        (if (> current-length max-length)
+            (progn
+              (cl-decf current-length (1- (length ss)))
+              (substring ss 0 1))
+          ss))
+      (split-string filepath "/")) "/")))
+
+(defun me/test/shorten-filepath ()
+  (dolist
+      (test-scenario
+       '(
+         (("foo" 5) "foo")
+         (("foo/bar" 5) "f/bar")
+         (("foo/bar" 10) "foo/bar")
+         ))
+    (let*
+        ((args (first test-scenario))
+         (expected (second test-scenario))
+         (actual (apply #'me/shorten-filepath args))
+         (test-passed (equal expected actual)))
+      (princ "[")
+      (princ (if test-passed "PASS" "FAIL"))
+      (princ "]")
+      (prin1 args)
+      (princ " -> ")
+      (prin1 actual)
+      (when (not test-passed)
+        (princ ", expected ")
+        (prin1 expected))
+      (princ "\n"))))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
