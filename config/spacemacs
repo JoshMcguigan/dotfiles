@@ -40,7 +40,6 @@ This function should only modify configuration layer settings."
            rust-backend 'lsp)
      (lsp :variables
           lsp-rust-server 'rust-analyzer)
-     multiple-cursors
      (shell :variables
             shell-default-shell 'vterm
             shell-default-position 'full)
@@ -373,7 +372,7 @@ me/navigation-direciton."
       (define-key evil-normal-state-map (kbd "n")
         (defun me/navigate-next ()
           (interactive)
-          (case me/navigate-active
+          (cl-case me/navigate-active
             ('me/navigate-active-search (evil-ex-search-next))
             ('me/navigate-active-hunks
              (if (eq me/navigate-direction 'me/navigate-forward)
@@ -390,7 +389,7 @@ me/navigation-direciton."
       (define-key evil-normal-state-map (kbd "N")
         (defun me/navigate-previous ()
           (interactive)
-          (case me/navigate-active
+          (cl-case me/navigate-active
             ('me/navigate-active-search (evil-ex-search-previous))
             ('me/navigate-active-hunks
              (if (eq me/navigate-direction 'me/navigate-forward)
