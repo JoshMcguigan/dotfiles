@@ -664,7 +664,7 @@ by abbreviating directories to a single letter."
     (string-join
      (mapcar
       (lambda (ss)
-        (if (> current-length max-length)
+        (if (and (> current-length max-length) (> (length ss) 1))
             (progn
               (cl-decf current-length (1- (length ss)))
               (substring ss 0 1))
@@ -696,6 +696,7 @@ by abbreviating directories to a single letter."
              (("foo" 5) "foo")
              (("foo/bar" 5) "f/bar")
              (("foo/bar" 10) "foo/bar")
+             (("/absolute/path" 10) "/a/path")
              ))
   )
 
