@@ -670,29 +670,33 @@ by abbreviating directories to a single letter."
           ss))
       (split-string filepath "/")) "/")))
 
-(defun me/test/shorten-filepath ()
-  (dolist
-      (test-scenario
-       '(
-         (("foo" 5) "foo")
-         (("foo/bar" 5) "f/bar")
-         (("foo/bar" 10) "foo/bar")
-         ))
+(defun me/test (fn test-cases)
+  (dolist (test-case test-cases)
     (let*
-        ((args (first test-scenario))
-         (expected (second test-scenario))
-         (actual (apply #'me/shorten-filepath args))
+        ((args (first test-case))
+         (expected (second test-case))
+         (actual (apply fn args))
          (test-passed (equal expected actual)))
-      (princ "[")
-      (princ (if test-passed "PASS" "FAIL"))
-      (princ "]")
-      (prin1 args)
-      (princ " -> ")
-      (prin1 actual)
-      (when (not test-passed)
-        (princ ", expected ")
-        (prin1 expected))
-      (princ "\n"))))
+      (princ (format
+              "[%s] (%s %s) -> %S%s\n"
+              (if test-passed "PASS" "FAIL")
+              fn
+              (string-join (mapcar (lambda (arg)(format "%S" arg)) args) " ")
+              actual
+              (if test-passed
+                  ""
+                (format ", expected %S" expected)))))))
+
+;; Wrap all the tests in a function so they don't automatically
+;; run on every startup.
+(defun me/all-tests ()
+  (me/test #'me/shorten-filepath
+           '(
+             (("foo" 5) "foo")
+             (("foo/bar" 5) "f/bar")
+             (("foo/bar" 10) "foo/bar")
+             ))
+  )
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
