@@ -6,6 +6,9 @@
 [._]ss[a-gi-z]
 [._]sw[a-p]
 
+# --- Emacs ---
+.#*
+
 # Session
 [Ss]ession*.vim
 

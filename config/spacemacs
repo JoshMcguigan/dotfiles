@@ -229,9 +229,7 @@ before packages are loaded."
         "\*" " "))
   (spaceline-define-segment me/version-control
     (when vc-mode
-      (powerline-raw
-       (replace-regexp-in-string "^ Git:" "" vc-mode))))
-
+      (powerline-raw me/git-modeline)))
 
   ;; Automatically save the state of tabs/buffers when closing emacs, and
   ;; restore when re-opening.
@@ -670,6 +668,62 @@ by abbreviating directories to a single letter."
               (substring ss 0 1))
           ss))
       (split-string filepath "/")) "/")))
+
+(defvar me/git-modeline "" "Last value of the modeline")
+(make-variable-buffer-local 'me/git-modeline)
+
+(defun me/in-git-p ()
+  (not (string-match "^fatal" (shell-command-to-string "git rev-parse --git-dir"))))
+
+(defun me/git-status ()
+  (let ((U 0)
+        (M 0)
+        (O 0)
+        (U-files (list))
+        (M-files (list))
+        (O-files (list)))
+    (dolist (line (split-string
+                   (shell-command-to-string "git status --porcelain")
+                   "\n"))
+      (cond
+
+       ((string= "" line) nil)
+
+       ((string-match "^\\?\\?" line)
+        (setq U (+ 1 U))
+        (push line U-files))
+
+       ((string-match "^ M" line)
+        (setq M (+ 1 M))
+        (push line M-files))
+
+       (t
+        (message "detected other in %s" line)
+        (setq O (+ 1 O))
+        (push line O-files))))
+
+    (remove-if-not #'identity (list
+     (me/git-current-branch)
+     (when (> M 0) (propertize
+      (format "m:%d" M)
+      'help-echo (string-join M-files "\n")))
+     (when (> U 0) (propertize
+      (format "u:%d" U)
+      'help-echo (string-join U-files "\n")))
+     (when (> O 0) (propertize
+      (format "o:%d" O)
+      'help-echo (string-join O-files "\n")))
+      ))))
+
+(defun me/git-current-branch ()
+  (string-trim-right (shell-command-to-string
+                      "git rev-parse --abbrev-ref HEAD")))
+
+(defun me/update-git-modeline ()
+  (setq me/git-modeline (if (me/in-git-p) (string-join (me/git-status) "|") "")))
+
+(add-hook 'after-save-hook #'me/update-git-modeline)
+(add-hook 'buffer-list-update-hook #'me/update-git-modeline)
 
 (defun me/test (fn test-cases)
   (dolist (test-case test-cases)
