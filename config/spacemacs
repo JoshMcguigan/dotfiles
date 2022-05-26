@@ -41,7 +41,13 @@ This function should only modify configuration layer settings."
      (rust :variables
            rust-backend 'lsp)
      (lsp :variables
-          lsp-rust-server 'rust-analyzer)
+          lsp-rust-server 'rust-analyzer
+
+          ;; Disable lsp mode lens to avoid the performance penalty.
+          ;;
+          ;; https://github.com/emacs-lsp/lsp-mode/issues/3219
+          lsp-lens-enable nil
+          )
      (shell :variables
             shell-default-shell 'vterm
             shell-default-position 'full)
@@ -230,6 +236,8 @@ before packages are loaded."
   (spaceline-define-segment me/version-control
     (when vc-mode
       (powerline-raw me/git-modeline)))
+  (add-hook 'after-save-hook #'me/update-git-modeline)
+  (add-hook 'buffer-list-update-hook #'me/update-git-modeline)
 
   ;; Automatically save the state of tabs/buffers when closing emacs, and
   ;; restore when re-opening.
@@ -721,9 +729,6 @@ by abbreviating directories to a single letter."
 
 (defun me/update-git-modeline ()
   (setq me/git-modeline (if (me/in-git-p) (string-join (me/git-status) "|") "")))
-
-(add-hook 'after-save-hook #'me/update-git-modeline)
-(add-hook 'buffer-list-update-hook #'me/update-git-modeline)
 
 (defun me/test (fn test-cases)
   (dolist (test-case test-cases)
