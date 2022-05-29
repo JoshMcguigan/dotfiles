@@ -322,6 +322,15 @@ before packages are loaded."
 
      (me/set-leader-keys "q" '("close window" . evil-quit))
 
+     (me/set-leader-keys "r" '("run" . projectile-repeat-last-command))
+     (me/declare-prefix "R" "run (setup)")
+     (me/set-leader-keys "Rc" '("compile" . projectile-compile-project))
+     (me/set-leader-keys "RC" '("configure" . projectile-configure-project))
+     (me/set-leader-keys "Ri" '("install" . projectile-install-project))
+     (me/set-leader-keys "Rp" '("package" . projectile-package-project))
+     (me/set-leader-keys "Rr" '("run" . projectile-run-project))
+     (me/set-leader-keys "Rt" '("test" . projectile-test-project))
+
      (me/declare-prefix "s" "split")
      (me/set-leader-keys "sh" '("split left" . split-window-right))
      (me/set-leader-keys "sj" '("split down" . split-window-below-and-focus))
