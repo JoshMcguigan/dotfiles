@@ -201,6 +201,11 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
         ))
 
     (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+
+  ;; Treat underscores as part of words, better matching vim behavior.
+  (add-hook 'after-change-major-mode-hook
+            (lambda ()
+              (modify-syntax-entry ?_ "w")))
 )
 
 
@@ -715,7 +720,6 @@ by abbreviating directories to a single letter."
         (push line M-files))
 
        (t
-        (message "detected other in %s" line)
         (setq O (+ 1 O))
         (push line O-files))))
 
