@@ -253,13 +253,6 @@ before packages are loaded."
 
   (setq-default rust-format-on-save t)
 
-  (setq-default indent-tabs-mode nil
-                tab-width 4)
-  (setq-default
-    c-default-style "linux"
-    c-basic-offset 4
-  )
-
   ;; By default ivy will stop the search if the user tries to delete more characters
   ;; than exist in the search term.
   (setq ivy-on-del-error-function #'ignore)
