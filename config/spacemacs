@@ -16,6 +16,7 @@ This function should only modify configuration layer settings."
      (c-c++ :variables
             c-c++-backend 'lsp-ccls
             c-c++-lsp-enable-semantic-highlight t
+            c-c++-enable-clang-format-on-save t
             )
 
      ;; The python layer depends on dap, and if you don't
@@ -39,7 +40,8 @@ This function should only modify configuration layer settings."
                       )
      (ivy :variables ivy-enable-advanced-buffer-information t)
      (rust :variables
-           rust-backend 'lsp)
+           rust-backend 'lsp
+           rust-format-on-save t)
      (lsp :variables
           lsp-rust-server 'rust-analyzer
 
@@ -251,7 +253,10 @@ before packages are loaded."
               (desktop-save-mode)
               (desktop-read)))
 
-  (setq-default rust-format-on-save t)
+  (setq-default
+   c-default-style "linux"
+   c-basic-offset 4
+   )
 
   ;; By default ivy will stop the search if the user tries to delete more characters
   ;; than exist in the search term.
