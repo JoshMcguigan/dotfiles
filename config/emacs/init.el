@@ -26,6 +26,7 @@
 
 (use-package emacs
   :config
+  (add-hook 'emacs-startup-hook (lambda () (set-frame-parameter nil 'fullscreen 'fullboth)))
   (setq
    display-line-numbers-type 'relative
    mouse-drag-copy-region t
