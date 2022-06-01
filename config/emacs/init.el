@@ -114,8 +114,7 @@
 
 (use-package projectile
   :init
-  ;; TODO replace home with ~ once running this config from actual home
-  (setq projectile-project-search-path '(("/home/josh/workspace" . 3)))
+  (setq projectile-project-search-path '(("~/workspace" . 3)))
   :config
   (projectile-mode))
 
@@ -136,6 +135,12 @@
   :custom
   (corfu-auto t))
 
+(use-package helpful
+  :after
+  evil
+  :config
+  (setq evil-lookup-func #'helpful-at-point))
+
 (use-package rust-mode)
 
 ;; This is a built-in package, but eglot requires a newer version.
@@ -147,7 +152,10 @@
   (add-to-list 'eglot-server-programs `(rust-mode . ("rust-analyzer")))
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'python-mode-hook 'eglot-ensure)
-  (add-hook 'rust-mode-hook 'eglot-ensure))
+  (add-hook 'rust-mode-hook 'eglot-ensure)
+  ;; eglot puts docs into eldoc, which can cause it to jump
+  ;; around if eldoc is allowed to use multiple lines.
+  (setq eldoc-echo-area-use-multiline-p nil))
 
 (use-package git-link)
 
