@@ -300,6 +300,9 @@ me/navigation-direciton."
    '(git-gutter:added-sign "|")
    '(git-gutter:deleted-sign "|")))
 
+(use-package magit
+  :defer t)
+
 (use-package bind-map
   :config
   (setq me/default-map (make-sparse-keymap))
