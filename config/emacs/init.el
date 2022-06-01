@@ -27,15 +27,17 @@
 (use-package emacs
   :config
   (setq
+   display-line-numbers-type 'relative
    mouse-drag-copy-region t
    tab-always-indent 'complete
    native-comp-async-report-warnings-errors 'silent
    scroll-conservatively most-positive-fixnum
    confirm-kill-emacs 'y-or-n-p
    ring-bell-function 'ignore)
-   (menu-bar-mode -1)
-   (tool-bar-mode -1)
-   (savehist-mode)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (savehist-mode)
+  (add-hook 'prog-mode-hook (lambda() (display-line-numbers-mode 1)))
   (setq-default
    c-default-style "linux"
    c-basic-offset 4)
