@@ -86,6 +86,7 @@
 (use-package evil
   :init
   (setq
+   evil-undo-system 'undo-redo
    evil-want-C-u-scroll t
    evil-want-keybinding nil)
   :config
