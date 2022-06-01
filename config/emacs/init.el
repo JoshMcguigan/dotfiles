@@ -88,14 +88,125 @@
    evil-want-keybinding nil)
   :config
   (evil-mode 1)
+
   (defun me/help-at-point ()
     (interactive)
     (cond
-      (eglot--managed-mode (select-window (eldoc-doc-buffer)))
+      ((eglot-managed-p) (select-window (eldoc-doc-buffer)))
       ((eq major-mode 'emacs-lisp-mode) (helpful-at-point))
       ;; Fallback to the evil mode default
       (t (woman))))
-  (setq evil-lookup-func #'me/help-at-point))
+  (setq evil-lookup-func #'me/help-at-point)
+
+  ;; Configure n/N to scroll through more than just search results.
+  ((lambda ()
+      (symbol-name 'me/navigate-active-search)
+      (symbol-name 'me/navigate-active-hunks)
+      (symbol-name 'me/navigate-active-errors)
+      ;; Default to assuming a search is active, as that should
+      ;; be safe at startup.
+      (setq-default me/navigate-active 'me/navigate-active-search)
+
+      ;; We track the direction the user is navigating (for example
+      ;; did they use next-hunk or previous-hunk) and make n/N behave
+      ;; appropriately.
+      ;;
+      ;; For search mode, this variable value is unused because
+      ;; evil tracks this for us.
+      (symbol-name 'me/navigate-forward)
+      (symbol-name 'me/navigate-reverse)
+      (setq-default me/navigate-direction 'me/navigate-forward)
+
+      (defun me/trace-search (&rest args)
+        (setq me/navigate-active 'me/navigate-active-search)
+        ;; Evil tracks this for us.
+        (setq me/navigate-direction nil)
+        )
+      (advice-add 'evil-search-forward :before #'me/trace-search)
+      (advice-add 'evil-search-backward :before #'me/trace-search)
+
+      (defun me/traced-vcs-next-hunk ()
+        "Wrapper function around git-gutter:next-hunk to track
+that we are navigating through hunks in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-hunks)
+        (setq me/navigate-direction 'me/navigate-forward)
+        (git-gutter:next-hunk 1))
+
+      (defun me/traced-vcs-previous-hunk ()
+        "Wrapper function around git-gutter:previous-hunk to track
+that we are navigating through hunks in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-hunks)
+        (setq me/navigate-direction 'me/navigate-reverse)
+        (git-gutter:previous-hunk 1))
+
+      (defun me/traced-next-error ()
+        "Wrapper function around flymake-goto-next-error to track
+that we are navigating through errors in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-errors)
+        (setq me/navigate-direction 'me/navigate-forward)
+        (call-interactively #'flymake-goto-next-error))
+
+      (defun me/traced-previous-error ()
+        "Wrapper function around flymake-goto-prev-error to track
+that we are navigating through errors in a particular direction. Any
+interactive user should use this function, but the underlying nagivate-*
+functions should not call this wrapper or else they can/will invert
+me/navigation-direciton."
+        (interactive)
+        (setq me/navigate-active 'me/navigate-active-errors)
+        (setq me/navigate-direction 'me/navigate-reverse)
+        (call-interactively #'flymake-goto-prev-error))
+
+      (define-key evil-normal-state-map (kbd "n")
+        (defun me/navigate-next ()
+          (interactive)
+          (cl-case me/navigate-active
+            ('me/navigate-active-search (evil-search-next))
+            ('me/navigate-active-hunks
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (git-gutter:next-hunk 1)
+               (git-gutter:previous-hunk 1))
+             )
+            ('me/navigate-active-errors
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (call-interactively #'flymake-goto-next-error)
+               (call-interactively #'flymake-goto-prev-error))
+             )
+            (t nil))))
+      (apply #'evil-set-command-properties #'me/navigate-next
+             (evil-get-command-properties #'evil-search-next))
+
+      (define-key evil-normal-state-map (kbd "N")
+        (defun me/navigate-previous ()
+          (interactive)
+          (cl-case me/navigate-active
+            ('me/navigate-active-search (evil-search-previous))
+            ('me/navigate-active-hunks
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (git-gutter:previous-hunk 1)
+               (git-gutter:next-hunk 1))
+             )
+            ('me/navigate-active-errors
+             (if (eq me/navigate-direction 'me/navigate-forward)
+                 (call-interactively #'flymake-goto-prev-error)
+               (call-interactively #'flymake-goto-next-error))
+             )
+            (t nil))))
+      (apply #'evil-set-command-properties #'me/navigate-previous
+             (evil-get-command-properties #'evil-search-previous))
+  )))
 
 (use-package evil-collection
   :after
@@ -169,6 +280,16 @@
   :config
   (setq which-key-idle-delay 0.5)
   (which-key-mode))
+
+(use-package git-gutter
+  :config
+  (global-git-gutter-mode 1)
+  (custom-set-variables
+   ;; Disable confirmation when reverting hunk.
+   '(git-gutter:ask-p nil)
+   '(git-gutter:modified-sign "|")
+   '(git-gutter:added-sign "|")
+   '(git-gutter:deleted-sign "|")))
 
 (use-package bind-map
   :config
@@ -244,9 +365,9 @@
    "t" '("file tree (project)" . me/open-dired)
    "T" '("file tree (current dir)" . dired-jump)
 
-   "vr" '("revert hunk" . spacemacs/vcs-revert-hunk)
+   "vr" '("revert hunk" . git-gutter:revert-hunk)
    "vs" '("status" . magit-status)
-   "vv" '("view hunk" . spacemacs/vcs-show-hunk)
+   "vv" '("view hunk" . git-gutter:popup-hunk)
 
    "w" '("save file" . save-buffer)
 
