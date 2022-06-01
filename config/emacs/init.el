@@ -87,7 +87,15 @@
    evil-want-C-u-scroll t
    evil-want-keybinding nil)
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (defun me/help-at-point ()
+    (interactive)
+    (cond
+      (eglot--managed-mode (select-window (eldoc-doc-buffer)))
+      ((eq major-mode 'emacs-lisp-mode) (helpful-at-point))
+      ;; Fallback to the evil mode default
+      (t (woman))))
+  (setq evil-lookup-func #'me/help-at-point))
 
 (use-package evil-collection
   :after
@@ -135,11 +143,7 @@
   :custom
   (corfu-auto t))
 
-(use-package helpful
-  :after
-  evil
-  :config
-  (setq evil-lookup-func #'helpful-at-point))
+(use-package helpful)
 
 (use-package rust-mode)
 
