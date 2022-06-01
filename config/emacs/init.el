@@ -41,6 +41,7 @@
   (setq-default
    c-default-style "linux"
    c-basic-offset 4)
+  (defalias 'yes-or-no-p 'y-or-n-p)
   ;; Treat underscores as part of words, better matching vim behavior.
   (add-hook 'after-change-major-mode-hook
             (lambda ()
