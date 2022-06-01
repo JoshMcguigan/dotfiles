@@ -273,7 +273,12 @@ me/navigation-direciton."
   (add-hook 'rust-mode-hook 'eglot-ensure)
   ;; eglot puts docs into eldoc, which can cause it to jump
   ;; around if eldoc is allowed to use multiple lines.
-  (setq eldoc-echo-area-use-multiline-p nil))
+  (setq eldoc-echo-area-use-multiline-p nil)
+  ;; Add automatic format on save for specific programming languages.
+  (add-hook 'eglot-managed-mode-hook
+    (lambda ()
+    (when (member major-mode '(c-mode rust-mode))
+      (add-hook 'before-save-hook 'eglot-format nil t)))))
 
 (use-package git-link)
 
