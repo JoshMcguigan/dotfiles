@@ -36,6 +36,7 @@
    ring-bell-function 'ignore)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
+  (scroll-bar-mode -1)
   (savehist-mode)
   (add-hook 'prog-mode-hook (lambda() (display-line-numbers-mode 1)))
   (setq-default
