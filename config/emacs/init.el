@@ -64,6 +64,12 @@
   :straight (:type built-in)
   :defer t
   :config
+  ;; Remove default org bindings for M-h/l to allow tab-next/prev
+  ;; global bindings to work.
+  (define-key org-mode-map (kbd "<insert-state> M-h") nil)
+  (define-key org-mode-map (kbd "<normal-state> M-h") nil)
+  (define-key org-mode-map (kbd "<insert-state> M-l") nil)
+  (define-key org-mode-map (kbd "<normal-state> M-l") nil)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
