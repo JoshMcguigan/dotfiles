@@ -70,6 +70,8 @@
   (define-key org-mode-map (kbd "<normal-state> M-h") nil)
   (define-key org-mode-map (kbd "<insert-state> M-l") nil)
   (define-key org-mode-map (kbd "<normal-state> M-l") nil)
+  (define-key org-mode-map (kbd "<insert-state> M-<return>") nil)
+  (define-key org-mode-map (kbd "<normal-state> M-<return>") nil)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -248,6 +250,19 @@ me/navigation-direciton."
   (setq projectile-project-search-path '(("~/workspace" . 3)))
   :config
   (projectile-mode))
+
+(use-package project
+  :straight (:type built-in)
+  :defer t
+  :config
+  ;; eglot uses project rather than projectile to find project roots. But in nested
+  ;; git submodules project considers the parent git directory to be the root. This
+  ;; configures eglot to use projectile to find the project root, which considers
+  ;; the children git repositories as the project root.
+  (defun my-projectile-project-find-function (dir)
+  (let ((root (projectile-project-root dir)))
+    (and root (cons 'transient root))))
+  (add-to-list 'project-find-functions 'my-projectile-project-find-function))
 
 (use-package consult)
 
