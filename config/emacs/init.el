@@ -137,7 +137,9 @@
         (setq me/navigate-direction nil)
         )
       (advice-add 'evil-search-forward :before #'me/trace-search)
+      (advice-add 'evil-search-word-forward :before #'me/trace-search)
       (advice-add 'evil-search-backward :before #'me/trace-search)
+      (advice-add 'evil-search-word-backward :before #'me/trace-search)
 
       (defun me/traced-vcs-next-hunk ()
         "Wrapper function around git-gutter:next-hunk to track
